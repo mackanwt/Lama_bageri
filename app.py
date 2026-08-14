@@ -15,24 +15,11 @@ st.markdown("""
             color: #3C2A21;
         }
         .block-container {
-            padding-top: 1.5rem !important;
+            padding-top: 1.0rem !important;
             padding-bottom: 2.0rem !important;
             padding-left: 1.5rem !important;
             padding-right: 1.5rem !important;
             max-width: 98% !important;
-        }
-        
-        /* Flytande logga längst upp till vänster */
-        .floating-logo {
-            position: absolute;
-            top: 5px;
-            left: 15px;
-            z-index: 999;
-        }
-        .floating-logo img {
-            height: 60px;
-            object-fit: contain;
-            mix-blend-mode: multiply; /* Tar bort vit bakgrund */
         }
 
         /* Knappar */
@@ -47,11 +34,9 @@ st.markdown("""
             background-color: #C86D51 !important;
         }
 
-        /* Flytta FLIKARNA till höger för att lämna plats åt loggan */
+        /* Styling för Flikar */
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px;
-            justify-content: flex-end !important; /* Flyttar flikarna till höger */
-            padding-bottom: 5px;
         }
         .stTabs [data-baseweb="tab"] {
             border-radius: 8px 8px 0 0;
@@ -65,6 +50,12 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
+        /* Bild-mixmode för transparent logga */
+        div[data-testid="stImage"] img {
+            mix-blend-mode: multiply;
+            object-fit: contain;
+        }
+
         /* Tabellstyling */
         div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
             padding: 5px 8px !important;
@@ -72,17 +63,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
-# ==========================================
-# LOGGA TILL VÄNSTER
-# ==========================================
-logo_path = "Logga.jpg" if os.path.exists("Logga.jpg") else ("Logga.png" if os.path.exists("Logga.png") else None)
-if logo_path:
-    import base64
-    with open(logo_path, "rb") as f:
-        img_bytes = f.read()
-    encoded = base64.b64encode(img_bytes).decode()
-    st.markdown(f'<div class="floating-logo"><img src="data:image/png;base64,{encoded}"></div>', unsafe_allow_html=True)
 
 # ==========================================
 # DEFAULT DATA
@@ -181,29 +161,51 @@ def berakna_recept_totalt(r_namn):
     return 50.0, 4000
 
 # ==========================================
-# FLIKAR
+# HUVUDLAYOUT: LOGGA TILL VÄNSTER, FLIKAR TILL HÖGER
 # ==========================================
-tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
+header_col1, header_col2 = st.columns([1, 8], vertical_alignment="bottom")
 
+with header_col1:
+    logo_path = "Logga.jpg" if os.path.exists("Logga.jpg") else ("Logga.png" if os.path.exists("Logga.png") else None)
+    if logo_path:
+        st.image(logo_path, width=65)
+
+with header_col2:
+    tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
+
+# ==========================================
+# INNEHÅLL I FLIKARNA
+# ==========================================
+
+# Flik 1: Ingredienser (Anpassade/små kolumner)
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
-    st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=True)
+    col_t1, _ = st.columns([1, 2])
+    with col_t1:
+        st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=False)
 
+# Flik 2: Toppings (Anpassade/små kolumner)
 with tab2:
     st.subheader("🍓 Hantera Toppings")
-    alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
-    ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
-    if st.button("➕ Lägg till i Toppings"):
-        if ny_topping not in st.session_state.toppings_lista:
-            st.session_state.toppings_lista.append(ny_topping)
-            st.rerun()
-    st.dataframe(pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]), hide_index=True, use_container_width=True)
+    col_t2, _ = st.columns([1, 2])
+    with col_t2:
+        alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
+        ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
+        if st.button("➕ Lägg till i Toppings"):
+            if ny_topping not in st.session_state.toppings_lista:
+                st.session_state.toppings_lista.append(ny_topping)
+                st.rerun()
+        st.dataframe(pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]), hide_index=True, use_container_width=False)
 
+# Flik 3: Recept (Anpassade/små kolumner)
 with tab3:
     st.subheader("📖 Receptöversikt")
-    recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
-    st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=True)
+    col_t3, _ = st.columns([1, 2])
+    with col_t3:
+        recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
+        st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=False)
 
+# Flik 4: Orderbyggare (98% fullskärmsbredd)
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
