@@ -5,46 +5,40 @@ import os
 st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# MYSIG OCH BRED DESIGN (CSS)
+# DESIGN & STIL (CSS)
 # ==========================================
 st.markdown("""
     <style>
-        /* Bakgrund & Huvudlayout */
         .stApp {
             background-color: #FAF6F0;
             color: #3C2A21;
         }
         .block-container {
-            padding-top: 1.5rem !important;
+            padding-top: 1.0rem !important;
             padding-bottom: 2.0rem !important;
-            padding-left: 2.0rem !important;
-            padding-right: 2.0rem !important;
-            max-width: 98% !important; /* Gör appen bredare för att slippa horisontell scroll */
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+            max-width: 98% !important;
         }
         
         /* Knappar */
         .stButton>button {
-            border-radius: 12px !important;
+            border-radius: 10px !important;
             background-color: #D9826C !important;
             color: #FFFFFF !important;
             border: none !important;
             font-weight: 600 !important;
-            padding: 0.5rem 1rem !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
         }
         .stButton>button:hover {
             background-color: #C86D51 !important;
-            color: #FFFFFF !important;
-            transform: translateY(-1px);
         }
 
         /* Flikar */
         .stTabs [data-baseweb="tab-list"] {
-            gap: 8px;
+            gap: 6px;
         }
         .stTabs [data-baseweb="tab"] {
-            border-radius: 10px 10px 0 0;
+            border-radius: 8px 8px 0 0;
             padding: 8px 16px;
             background-color: #EFE6DC;
             color: #5C4033;
@@ -55,46 +49,20 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Expander & Kort */
-        .streamlit-expanderHeader {
-            background-color: #F3E9DF !important;
-            border-radius: 10px !important;
-            color: #4A3525 !important;
-            font-weight: 600 !important;
-        }
-        
-        /* Bild-behållare så loggan inte kapas */
-        div[data-testid="stImage"] {
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-        }
-        div[data-testid="stImage"] img {
-            max-height: 220px;
+        /* Logga: Gör den mindre och ta bort vit bakgrund via blend-mode */
+        .logo-header img {
+            max-height: 55px;
             object-fit: contain;
+            mix-blend-mode: multiply; /* Gör vit bakgrund genomskinlig mot beigt */
         }
 
-        /* Tabelljusteringar */
+        /* Tabellstyling */
         div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
-            padding: 6px 10px !important;
-            font-size: 13.5px !important;
+            padding: 5px 8px !important;
+            font-size: 13px !important;
         }
     </style>
 """, unsafe_allow_html=True)
-
-# ==========================================
-# LOGOTYP VISNING (SÄKRAD MOT KAPNING)
-# ==========================================
-c_left, c_logo, c_right = st.columns([2, 1.2, 2])
-with c_logo:
-    if os.path.exists("Logga.jpg"):
-        st.image("Logga.jpg")
-    elif os.path.exists("Logga.png"):
-        st.image("Logga.png")
-    else:
-        st.info("💡 Placera filen 'Logga.jpg' i samma mapp som app.py på GitHub för att visa logotypen.")
-
-st.markdown("---")
 
 # ==========================================
 # DEFAULT DATA
@@ -156,45 +124,20 @@ DEFAULT_RECEPT = {
 }
 
 DEFAULT_ORDERS = {
-    "Order 7-Eivor": {
-        "datum": "2026-04-29/2026-05-15",
-        "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
-            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0},
-            {"Recept": "Cookie", "Topping": "Kokosflingor (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 25, "Sålda": 24, "Pris_st": 10.0},
-            {"Recept": "Oat cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 150, "Satser": 1.0, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0},
-            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 18, "Sålda": 18, "Pris_st": 20.0},
-            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 38, "Sålda": 36, "Pris_st": 10.0}
-        ]
-    },
-    "Order 8-mamma": {
-        "datum": "2026-04-29/2026-05-15",
-        "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
-            {"Recept": "Cinnamon loaf", "Topping": "Ingen", "Mängd_g": 0, "Satser": 0.5, "Bakade": 1, "Sålda": 1, "Pris_st": 70.0},
-            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0}
-        ]
-    },
-    "Order 9-Pappa": {
-        "datum": "2026-06-02",
-        "rader": [
-            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 34, "Sålda": 25, "Pris_st": 10.0}
-        ]
-    },
-    "Order 10-mamma": {
-        "datum": "2026-06-13",
-        "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0},
-            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 18, "Sålda": 17, "Pris_st": 20.0},
-            {"Recept": "Orange cake", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 1, "Sålda": 1, "Pris_st": 120.0}
-        ]
-    },
     "Order 11-morfar": {
         "datum": "2026-06-13",
         "rader": [
             {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0},
             {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 17, "Sålda": 17, "Pris_st": 20.0},
             {"Recept": "Oat cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 150, "Satser": 1.0, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0}
+        ]
+    },
+    "Order 7-Eivor": {
+        "datum": "2026-04-29/2026-05-15",
+        "rader": [
+            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
+            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0},
+            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 38, "Sålda": 36, "Pris_st": 10.0}
         ]
     }
 }
@@ -218,9 +161,20 @@ def berakna_recept_totalt(r_namn):
     return 50.0, 4000
 
 # ==========================================
-# FLIKAR
+# LAYOUT MED LOGGA TILL VÄNSTER OM FLIKARNA
 # ==========================================
-tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
+col_logo, col_tabs = st.columns([0.6, 9.4])
+
+with col_logo:
+    st.markdown('<div class="logo-header">', unsafe_allow_html=True)
+    if os.path.exists("Logga.jpg"):
+        st.image("Logga.jpg")
+    elif os.path.exists("Logga.png"):
+        st.image("Logga.png")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col_tabs:
+    tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
@@ -253,7 +207,7 @@ with tab4:
     st.caption(f"Datum: {nuvarande_order['datum']}")
 
     # ------------------------------------------
-    # REDIGERING DIREKT I CELLER (DATA EDITOR)
+    # REDIGERING DIREKT I CELLER
     # ------------------------------------------
     with st.expander("✏️ Redigera orderrader direkt i tabellen", expanded=True):
         df_edit = pd.DataFrame(nuvarande_order["rader"])
@@ -274,11 +228,10 @@ with tab4:
             key=f"editor_{valj_order}"
         )
         
-        # Spara automatiskt ändringar från cellerna
         nuvarande_order["rader"] = edited_df.to_dict(orient="records")
 
     # ------------------------------------------
-    # BERÄKNA & FÄRGKODA SAMMANSTÄLLNING
+    # BERÄKNING
     # ------------------------------------------
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser}
     table_rows = []
@@ -333,7 +286,7 @@ with tab4:
             "Mängd": f"{mängd_g} g" if topping_namn != "Ingen" else "",
             "Topping kr": f"{top_k:.2f} kr" if top_k > 0 else "",
             "Topping kcal": f"{top_kcal} kcal" if top_kcal > 0 else "",
-            "Satser": rad_satser,
+            "Satser": f"{rad_satser:.1f}", # Endast 1 decimal
             "Bakade": f"{rad_bakade} st",
             "Sålda": f"{rad_salda} st",
             "Kostnad": f"{round(rad_tot_kostnad)} kr",
@@ -372,16 +325,51 @@ with tab4:
 
     df_display = pd.DataFrame(table_rows)
 
-    # FÄRGKODNINGSFUNKTION (MYSIG PEACH/VARMA TONER)
-    def fargkoda_rader(row):
-        if row["Recept"] == "Tot":
-            return ["background-color: #E8C3B9; font-weight: bold; color: #3C2A21;"] * len(row)
-        elif row.name % 2 == 0:
-            return ["background-color: #F8EFE6; color: #3C2A21;"] * len(row)
-        else:
-            return ["background-color: #FFFFFF; color: #3C2A21;"] * len(row)
+    # ------------------------------------------
+    # FÄRGKODNING AV KOLUMNER PÅ BILDENS SÄTT
+    # ------------------------------------------
+    def fargkoda_kolumner(df):
+        styles = pd.DataFrame('', index=df.index, columns=df.columns)
+        
+        # Färgpaletter för kategorier (Mjuka pasteller)
+        farger = {
+            "grå": "background-color: #E2E8F0; color: #1E293B;",
+            "gul": "background-color: #FEF9C3; color: #713F12;",       # Toppings
+            "vit": "background-color: #FFFFFF; color: #0F172A;",       # Satser
+            "rosa": "background-color: #FCE7F3; color: #831843;",      # Bakade / Sålda
+            "grön": "background-color: #DCFCE7; color: #14532D;",      # Kostnader
+            "blå": "background-color: #DBEAFE; color: #1E3A8A;",       # Pris & Vinst
+            "beige": "background-color: #FEF3C7; color: #78350F;",     # Kalorier
+            "tot_rad": "background-color: #475569; color: #FFFFFF; font-weight: bold;" # Summering
+        }
 
-    styled_df = df_display.style.apply(fargkoda_rader, axis=1)
+        # Applicera kolumnfäger
+        styles["Recept"] = farger["grå"]
+        styles["Toppings"] = farger["gul"]
+        styles["Mängd"] = farger["gul"]
+        styles["Topping kr"] = farger["gul"]
+        styles["Topping kcal"] = farger["gul"]
+        styles["Satser"] = farger["vit"]
+        styles["Bakade"] = farger["rosa"]
+        styles["Sålda"] = farger["rosa"]
+        styles["Kostnad"] = farger["grön"]
+        styles["Kostnad/bakad kaka"] = farger["grön"]
+        styles["Kostnad/såld kaka"] = farger["grön"]
+        styles["Pris/cookie"] = farger["blå"]
+        styles["vinstpåslag"] = farger["blå"]
+        styles["vinst"] = farger["blå"]
+        styles["Pris"] = farger["blå"]
+        styles["Kalorier/sats"] = farger["beige"]
+        styles["Kalorier/st"] = farger["beige"]
+
+        # Skriv över sista raden ("Tot") med en mörk markerad stil
+        tot_idx = df[df["Recept"] == "Tot"].index
+        for idx in tot_idx:
+            styles.loc[idx] = farger["tot_rad"]
+
+        return styles
+
+    styled_df = df_display.style.apply(fargkoda_kolumner, axis=None)
 
     st.markdown("#### 📊 Sammanställning & Kalkyl")
     st.dataframe(styled_df, hide_index=True, use_container_width=True)
