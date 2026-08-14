@@ -1,78 +1,20 @@
 import streamlit as st
 import pandas as pd
+import os
 
 st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# REKONSTRUERAD LOGOTYP SOM MATCHAR LOGGA.JPG EXAKT
+# VISNING AV LOGOTYP FRÅN BILD
 # ==========================================
-EXAKT_LAMA_LOGO = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 550" width="180" height="200" style="display: block; margin: auto;">
-  <g stroke="#3A3F47" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Öron -->
-    <path d="M 125,180 C 100,100 130,50 165,100 C 185,130 170,170 155,190" fill="#ffffff"/>
-    <path d="M 135,160 C 120,110 138,80 155,110"/>
-    
-    <!-- Bagarhatt -->
-    <path d="M 195,120 C 170,40 280,10 380,40 C 430,70 440,140 375,170 Z" fill="#ffffff"/>
-    <path d="M 200,102 C 200,102 330,160 370,190 L 340,230 C 290,190 170,140 170,140 Z" fill="#ffffff"/>
-    
-    <!-- Blommor på hatt/band -->
-    <!-- Blomma vänster hatt -->
-    <circle cx="180" cy="45" r="8" fill="#ffffff"/><circle cx="180" cy="30" r="8" fill="#ffffff"/><circle cx="195" cy="40" r="8" fill="#ffffff"/><circle cx="165" cy="40" r="8" fill="#ffffff"/><circle cx="180" cy="40" r="5" fill="#3A3F47"/>
-    <!-- Blomma höger hatt -->
-    <circle cx="385" cy="75" r="8" fill="#ffffff"/><circle cx="385" cy="60" r="8" fill="#ffffff"/><circle cx="400" cy="70" r="8" fill="#ffffff"/><circle cx="370" cy="70" r="8" fill="#ffffff"/><circle cx="385" cy="70" r="5" fill="#3A3F47"/>
-    <!-- Blomma mitt på bandet -->
-    <circle cx="290" cy="150" r="10" fill="#ffffff"/><circle cx="290" cy="130" r="10" fill="#ffffff"/><circle cx="310" cy="142" r="10" fill="#ffffff"/><circle cx="270" cy="142" r="10" fill="#ffffff"/><circle cx="290" cy="142" r="6" fill="#3A3F47"/>
-
-    <!-- Huvud/Ull-kontur -->
-    <path d="M 155,190 C 130,220 120,260 130,300 C 120,340 140,380 170,400 C 200,420 250,430 300,425 C 350,420 380,390 390,340 C 400,300 390,260 375,230" fill="#ffffff"/>
-    
-    <!-- Ansikte (Mule och mun) -->
-    <ellipse cx="250" cy="270" rx="42" ry="32" fill="#ffffff"/>
-    <path d="M 230,250 C 240,235 260,235 270,250 C 275,260 260,275 250,275 C 240,275 225,260 230,250 Z" fill="#ffffff"/>
-    <path d="M 250,275 L 250,290 M 230,290 C 240,305 260,305 270,290" fill="#ffffff"/>
-    
-    <!-- Ögon med fransar och pupiller -->
-    <ellipse cx="185" cy="230" rx="20" ry="22" fill="#3A3F47"/>
-    <ellipse cx="315" cy="230" rx="20" ry="22" fill="#3A3F47"/>
-    <!-- Glans i ögon -->
-    <circle cx="178" cy="220" r="7" fill="#ffffff"/>
-    <circle cx="190" cy="235" r="3.5" fill="#ffffff"/>
-    <circle cx="308" cy="220" r="7" fill="#ffffff"/>
-    <circle cx="320" cy="235" r="3.5" fill="#ffffff"/>
-    <!-- Ögonfransar -->
-    <path d="M 165,218 C 150,210 145,220 150,225 M 168,212 L 160,202 M 175,210 L 172,198"/>
-    <path d="M 335,218 C 350,210 355,220 350,225 M 332,212 L 340,202 M 325,210 L 328,198"/>
-    
-    <!-- Kinder -->
-    <ellipse cx="170" cy="268" rx="14" ry="9" fill="#ffffff"/>
-    <ellipse cx="330" cy="268" rx="14" ry="9" fill="#ffffff"/>
-
-    <!-- Kropp / Päls -->
-    <path d="M 145,340 C 140,420 150,490 200,500 C 250,510 330,510 350,480" fill="#ffffff"/>
-    <path d="M 180,420 Q 200,440 220,420 M 280,410 Q 300,430 320,410 M 230,460 Q 250,480 270,460"/>
-
-    <!-- Kavel och Tass -->
-    <g transform="rotate(-15 380 340)">
-      <rect x="380" y="220" width="30" height="150" rx="8" fill="#ffffff"/>
-      <path d="M 395,190 L 395,220 M 395,370 L 395,400" stroke-width="10"/>
-      <!-- Tass som håller -->
-      <path d="M 350,320 C 330,320 330,360 360,370 C 380,375 400,360 390,330 Z" fill="#ffffff"/>
-    </g>
-
-    <!-- Stjärnor och Blommor runt om -->
-    <!-- Stjärnor -->
-    <path d="M 90,140 L 93,148 L 101,148 L 95,153 L 97,161 L 90,156 L 83,161 L 85,153 L 79,148 L 87,148 Z" fill="#ffffff"/>
-    <path d="M 60,238 L 63,246 L 71,246 L 65,251 L 67,259 L 60,254 L 53,259 L 55,251 L 49,246 L 57,246 Z" fill="#ffffff"/>
-    <path d="M 115,335 L 118,343 L 126,343 L 120,348 L 122,356 L 115,351 L 108,356 L 110,348 L 104,343 L 112,343 Z" fill="#ffffff"/>
-    <!-- Blommor vänster -->
-    <circle cx="75" cy="185" r="10" fill="#ffffff"/><circle cx="75" cy="170" r="10" fill="#ffffff"/><circle cx="90" cy="178" r="10" fill="#ffffff"/><circle cx="60" cy="178" r="10" fill="#ffffff"/><circle cx="75" cy="178" r="6" fill="#3A3F47"/>
-    <circle cx="85" cy="295" r="10" fill="#ffffff"/><circle cx="85" cy="280" r="10" fill="#ffffff"/><circle cx="100" cy="288" r="10" fill="#ffffff"/><circle cx="70" cy="288" r="10" fill="#ffffff"/><circle cx="85" cy="288" r="6" fill="#3A3F47"/>
-  </g>
-  
-  <!-- TEXT UNDER LOGGAN EXAKT SOM BILDEN -->
-  <text x="250" y="535" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="46" fill="#3A3F47" letter-spacing="1">Lama Bageri</text>
-</svg>"""
+col_left, col_logo, col_right = st.columns([2, 1, 2])
+with col_logo:
+    if os.path.exists("Logga.jpg"):
+        st.image("Logga.jpg", width=220)
+    elif os.path.exists("Logga.png"):
+        st.image("Logga.png", width=220)
+    else:
+        st.info("💡 Placera filen 'Logga.jpg' i samma mapp som app.py för att visa logotypen.")
 
 st.markdown("""
     <style>
@@ -88,8 +30,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Visar loggan centrerat
-st.markdown(EXAKT_LAMA_LOGO, unsafe_allow_html=True)
 st.markdown("---")
 
 # ==========================================
@@ -216,9 +156,6 @@ def berakna_recept_totalt(r_namn):
 # FLIKAR
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
-# ==========================================
-# FLIK 1 & 2 & 3: STANDARD
-# ==========================================
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
     st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=True)
@@ -238,9 +175,6 @@ with tab3:
     recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
     st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=True)
 
-# ==========================================
-# FLIK 4: ORDERBYGGARE MED ALLA 5 ORDRAR
-# ==========================================
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
@@ -252,7 +186,6 @@ with tab4:
     st.markdown(f"### {valj_order}")
     st.caption(f"Datum: {nuvarande_order['datum']}")
 
-    # Form för att lägga till ny rad i vald order
     with st.expander("➕ Lägg till rad i denna order", expanded=False):
         c1, c2, c3 = st.columns(3)
         sel_rec = c1.selectbox("Huvudrecept", list(st.session_state.recept.keys()))
@@ -273,7 +206,6 @@ with tab4:
             })
             st.rerun()
 
-    # GENERERA EXCEL-TABELLEN FÖR VALD ORDER
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser}
     table_rows = []
     
@@ -338,7 +270,6 @@ with tab4:
             "Kalorier/st": f"{rad_kalorier_st} kcal"
         })
 
-    # Totalsumma (Tot)
     tot_vinstpaslag = (tot_vinst / tot_kostnad * 100) if tot_kostnad > 0 else 0
     tot_snitt_bakad = tot_kostnad / tot_bakade if tot_bakade > 0 else 0
     tot_snitt_sald = tot_kostnad / tot_salda if tot_salda > 0 else 0
