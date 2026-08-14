@@ -15,22 +15,22 @@ st.markdown("""
             color: #3C2A21;
         }
         .block-container {
-            padding-top: 4.0rem !important; /* Extra utrymme i toppen för loggan */
+            padding-top: 1.5rem !important;
             padding-bottom: 2.0rem !important;
             padding-left: 1.5rem !important;
             padding-right: 1.5rem !important;
             max-width: 98% !important;
         }
         
-        /* Flytande logga uppe till vänster (påverkar inte layouten i övrigt) */
+        /* Flytande logga längst upp till vänster */
         .floating-logo {
             position: absolute;
-            top: 10px;
-            left: 20px;
+            top: 5px;
+            left: 15px;
             z-index: 999;
         }
         .floating-logo img {
-            height: 65px;
+            height: 60px;
             object-fit: contain;
             mix-blend-mode: multiply; /* Tar bort vit bakgrund */
         }
@@ -47,9 +47,11 @@ st.markdown("""
             background-color: #C86D51 !important;
         }
 
-        /* Flikar - Snygg styling */
+        /* Flytta FLIKARNA till höger för att lämna plats åt loggan */
         .stTabs [data-baseweb="tab-list"] {
-            gap: 6px;
+            gap: 8px;
+            justify-content: flex-end !important; /* Flyttar flikarna till höger */
+            padding-bottom: 5px;
         }
         .stTabs [data-baseweb="tab"] {
             border-radius: 8px 8px 0 0;
@@ -72,7 +74,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# FLYTANDE LOGGA TILL VÄNSTER
+# LOGGA TILL VÄNSTER
 # ==========================================
 logo_path = "Logga.jpg" if os.path.exists("Logga.jpg") else ("Logga.png" if os.path.exists("Logga.png") else None)
 if logo_path:
