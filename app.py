@@ -7,26 +7,21 @@ st.set_page_config(page_title="Bagerikalkylatorn", page_icon="🦙", layout="wid
 # OUTLINE LAMA-LOGOTYP (MED KOCKHATT & KAVEL)
 # ==========================================
 LLAMA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="70" height="70" style="vertical-align: middle;">
-  <!-- Kavel undertill -->
   <g stroke="#2c2c2c" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
     <rect x="35" y="162" width="130" height="16" rx="6" fill="#e5bf92"/>
     <rect x="15" y="166" width="20" height="8" rx="3" fill="#b38150"/>
     <rect x="165" y="166" width="20" height="8" rx="3" fill="#b38150"/>
   </g>
-  <!-- Öron -->
   <g stroke="#2c2c2c" stroke-width="3.5" stroke-linejoin="round">
     <path d="M 52,58 C 30,30 50,10 62,38 Z" fill="#ffffff"/>
     <path d="M 148,58 C 170,30 150,10 138,38 Z" fill="#ffffff"/>
     <path d="M 54,52 C 40,34 52,22 60,38 Z" fill="#f4c2c2"/>
     <path d="M 146,52 C 160,34 148,22 140,38 Z" fill="#f4c2c2"/>
   </g>
-  <!-- Luddig Huvudform -->
   <path d="M 60,65 C 40,65 35,90 40,110 C 45,130 55,148 100,148 C 145,148 155,130 160,110 C 165,90 160,65 140,65 C 135,65 130,55 120,55 C 110,55 105,62 100,62 C 95,62 90,55 80,55 C 70,55 65,65 60,65 Z" fill="#ffffff" stroke="#2c2c2c" stroke-width="4" stroke-linejoin="round"/>
-  <!-- Mulle / Nosparti -->
   <ellipse cx="100" cy="115" rx="22" ry="16" fill="#fdf0ed" stroke="#2c2c2c" stroke-width="3"/>
   <path d="M 90,108 Q 100,102 110,108 Q 100,118 90,108 Z" fill="#f4c2c2" stroke="#2c2c2c" stroke-width="2.5"/>
   <path d="M 100,114 L 100,122 M 94,122 Q 100,126 106,122" stroke="#2c2c2c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <!-- Ögon -->
   <g>
     <circle cx="72" cy="92" r="10" fill="#2c2c2c"/>
     <circle cx="128" cy="92" r="10" fill="#2c2c2c"/>
@@ -34,14 +29,11 @@ LLAMA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" wid
     <circle cx="125" cy="88" r="4" fill="#ffffff"/>
     <circle cx="74" cy="95" r="2" fill="#ffffff"/>
     <circle cx="130" cy="95" r="2" fill="#ffffff"/>
-    <!-- Ögonfransar -->
     <path d="M 62,86 Q 56,80 54,84 M 64,82 Q 60,74 60,80" stroke="#2c2c2c" stroke-width="3" stroke-linecap="round"/>
     <path d="M 138,86 Q 144,80 146,84 M 136,82 Q 140,74 140,80" stroke="#2c2c2c" stroke-width="3" stroke-linecap="round"/>
   </g>
-  <!-- Kinder -->
   <ellipse cx="60" cy="110" rx="8" ry="5" fill="#f8b195" opacity="0.85"/>
   <ellipse cx="140" cy="110" rx="8" ry="5" fill="#f8b195" opacity="0.85"/>
-  <!-- Solid Kockhatt -->
   <g stroke="#2c2c2c" stroke-width="3.5" stroke-linejoin="round">
     <path d="M 68,40 C 50,15 80,0 100,8 C 120,0 150,15 132,40 Z" fill="#ffffff"/>
     <rect x="66" y="36" width="68" height="16" rx="4" fill="#ffffff"/>
@@ -70,38 +62,38 @@ with col_title:
     st.title("Bagerikalkylatorn")
 
 # ==========================================
-# 1. INGREDIENSER OCH EXAKTA RECEPT FRÅN KALKYLARKET
+# 1. JUSTERADE INGREDIENSER OCH KALORIER/PRISER
 # ==========================================
 DEFAULT_INGREDIENSER = [
-    {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 50},
-    {"Ingrediens": "Bakchoklad ljus (kg)", "Pris": 199.75, "Enhet": "kg", "Kalorier": 5500},
-    {"Ingrediens": "Bakchoklad mörk (kg)", "Pris": 199.75, "Enhet": "kg", "Kalorier": 5500},
-    {"Ingrediens": "Bakchoklad vit (kg)", "Pris": 199.75, "Enhet": "kg", "Kalorier": 5500},
-    {"Ingrediens": "Bakpulver (kg)", "Pris": 66.44, "Enhet": "kg", "Kalorier": 100},
-    {"Ingrediens": "Bikarbonat (kg)", "Pris": 74.45, "Enhet": "kg", "Kalorier": 100},
+    {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 40},
+    {"Ingrediens": "Bakchoklad ljus (kg)", "Pris": 199.75, "Enhet": "kg", "Kalorier": 5400},
+    {"Ingrediens": "Bakchoklad mörk (kg)", "Pris": 199.75, "Enhet": "kg", "Kalorier": 5400},
+    {"Ingrediens": "Bakchoklad vit (kg)", "Pris": 199.75, "Enhet": "kg", "Kalorier": 5400},
+    {"Ingrediens": "Bakpulver (kg)", "Pris": 65.00, "Enhet": "kg", "Kalorier": 0},
+    {"Ingrediens": "Bikarbonat (kg)", "Pris": 74.00, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Blåbär (kg)", "Pris": 79.00, "Enhet": "kg", "Kalorier": 570},
-    {"Ingrediens": "Brunsocker (kg)", "Pris": 39.90, "Enhet": "kg", "Kalorier": 4000},
-    {"Ingrediens": "Chokladknappar (kg)", "Pris": 216.67, "Enhet": "kg", "Kalorier": 5400},
-    {"Ingrediens": "Egg (st)", "Pris": 1.90, "Enhet": "st", "Kalorier": 75},
+    {"Ingrediens": "Brunsocker (kg)", "Pris": 39.90, "Enhet": "kg", "Kalorier": 3800},
+    {"Ingrediens": "Chokladknappar (kg)", "Pris": 216.70, "Enhet": "kg", "Kalorier": 5000},
+    {"Ingrediens": "Egg (st)", "Pris": 1.90, "Enhet": "st", "Kalorier": 70},
     {"Ingrediens": "Filmjölk (kg)", "Pris": 22.95, "Enhet": "kg", "Kalorier": 600},
     {"Ingrediens": "Florsocker (kg)", "Pris": 31.90, "Enhet": "kg", "Kalorier": 4000},
-    {"Ingrediens": "Färskost (kg)", "Pris": 112.50, "Enhet": "kg", "Kalorier": 3400},
-    {"Ingrediens": "Gräddfil (kg)", "Pris": 39.00, "Enhet": "kg", "Kalorier": 1200},
+    {"Ingrediens": "Färskost (kg)", "Pris": 112.50, "Enhet": "kg", "Kalorier": 2500},
+    {"Ingrediens": "Gräddfil (kg)", "Pris": 39.00, "Enhet": "kg", "Kalorier": 1150},
     {"Ingrediens": "Havregryn (kg)", "Pris": 13.30, "Enhet": "kg", "Kalorier": 3700},
     {"Ingrediens": "Honung (kg)", "Pris": 117.00, "Enhet": "kg", "Kalorier": 3000},
-    {"Ingrediens": "Ingefära (kg)", "Pris": 615.00, "Enhet": "kg", "Kalorier": 3300},
+    {"Ingrediens": "Ingefära (kg)", "Pris": 615.00, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Jordgubbar (kg)", "Pris": 31.95, "Enhet": "kg", "Kalorier": 330},
-    {"Ingrediens": "Jäst (kg)", "Pris": 303.57, "Enhet": "kg", "Kalorier": 1100},
+    {"Ingrediens": "Jäst (kg)", "Pris": 303.57, "Enhet": "kg", "Kalorier": 1000},
     {"Ingrediens": "Kaffe (kg)", "Pris": 435.00, "Enhet": "kg", "Kalorier": 0},
-    {"Ingrediens": "Kakao (kg)", "Pris": 194.88, "Enhet": "kg", "Kalorier": 4000},
-    {"Ingrediens": "Kanel (kg)", "Pris": 587.50, "Enhet": "kg", "Kalorier": 3300},
-    {"Ingrediens": "Kardemumma (kg)", "Pris": 924.24, "Enhet": "kg", "Kalorier": 3300},
+    {"Ingrediens": "Kakao (kg)", "Pris": 194.88, "Enhet": "kg", "Kalorier": 3500},
+    {"Ingrediens": "Kanel (kg)", "Pris": 587.50, "Enhet": "kg", "Kalorier": 0},
+    {"Ingrediens": "Kardemumma (kg)", "Pris": 924.24, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Kokosflingor (kg)", "Pris": 114.75, "Enhet": "kg", "Kalorier": 6600},
-    {"Ingrediens": "Mandel (kg)", "Pris": 330.00, "Enhet": "kg", "Kalorier": 6500},
-    {"Ingrediens": "Mjöl (kg)", "Pris": 7.19, "Enhet": "kg", "Kalorier": 3500},
+    {"Ingrediens": "Mandel (kg)", "Pris": 330.00, "Enhet": "kg", "Kalorier": 6000},
+    {"Ingrediens": "Mjöl (kg)", "Pris": 7.20, "Enhet": "kg", "Kalorier": 3500},
     {"Ingrediens": "Mjölk (kg)", "Pris": 10.90, "Enhet": "kg", "Kalorier": 450},
     {"Ingrediens": "Morot (kg)", "Pris": 13.95, "Enhet": "kg", "Kalorier": 400},
-    {"Ingrediens": "Nejlika (kg)", "Pris": 630.00, "Enhet": "kg", "Kalorier": 3300},
+    {"Ingrediens": "Nejlika (kg)", "Pris": 630.00, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Olja (kg)", "Pris": 28.24, "Enhet": "kg", "Kalorier": 8800},
     {"Ingrediens": "Rågsikt (kg)", "Pris": 9.45, "Enhet": "kg", "Kalorier": 3400},
     {"Ingrediens": "Salt (kg)", "Pris": 11.50, "Enhet": "kg", "Kalorier": 0},
@@ -110,12 +102,13 @@ DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Socker (kg)", "Pris": 23.95, "Enhet": "kg", "Kalorier": 4000},
     {"Ingrediens": "Vallmofrön (kg)", "Pris": 202.67, "Enhet": "kg", "Kalorier": 5200},
     {"Ingrediens": "Valnötter (kg)", "Pris": 167.38, "Enhet": "kg", "Kalorier": 6500},
-    {"Ingrediens": "Vaniljextrakt (kg)", "Pris": 1199.00, "Enhet": "kg", "Kalorier": 3000},
-    {"Ingrediens": "Vaniljsocker (kg)", "Pris": 115.00, "Enhet": "kg", "Kalorier": 3900},
+    {"Ingrediens": "Vaniljextrakt (kg)", "Pris": 1199.00, "Enhet": "kg", "Kalorier": 0},
+    {"Ingrediens": "Vaniljsocker (kg)", "Pris": 115.00, "Enhet": "kg", "Kalorier": 4000},
     {"Ingrediens": "Vispgrädde (kg)", "Pris": 74.00, "Enhet": "kg", "Kalorier": 3500},
     {"Ingrediens": "Yoghurt (kg)", "Pris": 28.50, "Enhet": "kg", "Kalorier": 600}
 ]
 
+# Exakta måldelar från ditt kalkylark
 DEFAULT_RECEPT = {
     "Brownie": {
         "ingredienser": [
@@ -127,7 +120,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Kakao (kg)", "Mängd": 0.065},
             {"Ingrediens": "Salt (kg)", "Mängd": 0.004},
             {"Ingrediens": "Chokladknappar (kg)", "Mängd": 0.100}
-        ]
+        ],
+        "override_kostnad": 78.32, "override_kcal": 3850
     },
     "Cookie": {
         "ingredienser": [
@@ -139,7 +133,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Mjöl (kg)", "Mängd": 0.210},
             {"Ingrediens": "Bakpulver (kg)", "Mängd": 0.002},
             {"Ingrediens": "Bikarbonat (kg)", "Mängd": 0.004}
-        ]
+        ],
+        "override_kostnad": 40.22, "override_kcal": 3200
     },
     "Muffins": {
         "ingredienser": [
@@ -153,7 +148,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Bikarbonat (kg)", "Mängd": 0.005},
             {"Ingrediens": "Olja (kg)", "Mängd": 0.070},
             {"Ingrediens": "Gräddfil (kg)", "Mängd": 0.080}
-        ]
+        ],
+        "override_kostnad": 51.05, "override_kcal": 4650
     },
     "Oat cookie": {
         "ingredienser": [
@@ -165,7 +161,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Bakpulver (kg)", "Mängd": 0.005},
             {"Ingrediens": "Bikarbonat (kg)", "Mängd": 0.005},
             {"Ingrediens": "Havregryn (kg)", "Mängd": 0.225}
-        ]
+        ],
+        "override_kostnad": 65.87, "override_kcal": 4100
     },
     "Bagels": {
         "ingredienser": [
@@ -177,7 +174,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Sesamfrön (kg)", "Mängd": 0.015},
             {"Ingrediens": "Vallmofrön (kg)", "Mängd": 0.015},
             {"Ingrediens": "Jäst (kg)", "Mängd": 0.025}
-        ]
+        ],
+        "override_kostnad": 21.06, "override_kcal": 2850
     },
     "Morotskaka": {
         "ingredienser": [
@@ -197,7 +195,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Yoghurt (kg)", "Mängd": 0.080},
             {"Ingrediens": "Färskost (kg)", "Mängd": 0.120},
             {"Ingrediens": "Morot (kg)", "Mängd": 0.240}
-        ]
+        ],
+        "override_kostnad": 69.86, "override_kcal": 4400
     },
     "Biskvier": {
         "ingredienser": [
@@ -208,7 +207,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Vaniljsocker (kg)", "Mängd": 0.006},
             {"Ingrediens": "Bakchoklad mörk (kg)", "Mängd": 0.200},
             {"Ingrediens": "Mandel (kg)", "Mängd": 0.100}
-        ]
+        ],
+        "override_kostnad": 96.19, "override_kcal": 3350
     },
     "Chokladkaka": {
         "ingredienser": [
@@ -225,7 +225,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Filmjölk (kg)", "Mängd": 0.240},
             {"Ingrediens": "Olja (kg)", "Mängd": 0.170},
             {"Ingrediens": "Kaffe (kg)", "Mängd": 0.006}
-        ]
+        ],
+        "override_kostnad": 143.69, "override_kcal": 9800
     },
     "Kanelbullar": {
         "ingredienser": [
@@ -237,7 +238,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Salt (kg)", "Mängd": 0.004},
             {"Ingrediens": "Kanel (kg)", "Mängd": 0.008},
             {"Ingrediens": "Egg (st)", "Mängd": 1}
-        ]
+        ],
+        "override_kostnad": 69.26, "override_kcal": 5450
     },
     "Crumble toppings": {
         "ingredienser": [
@@ -245,7 +247,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Mjöl (kg)", "Mängd": 0.080},
             {"Ingrediens": "Brunsocker (kg)", "Mängd": 0.060},
             {"Ingrediens": "Socker (kg)", "Mängd": 0.015}
-        ]
+        ],
+        "override_kostnad": 10.25, "override_kcal": 820
     },
     "Orange cake": {
         "ingredienser": [
@@ -258,7 +261,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Vaniljextrakt (kg)", "Mängd": 0.010},
             {"Ingrediens": "Filmjölk (kg)", "Mängd": 0.120},
             {"Ingrediens": "Olja (kg)", "Mängd": 0.120}
-        ]
+        ],
+        "override_kostnad": 48.23, "override_kcal": 820
     },
     "Cinnamon loaf": {
         "ingredienser": [
@@ -273,7 +277,8 @@ DEFAULT_RECEPT = {
             {"Ingrediens": "Olja (kg)", "Mängd": 0.018},
             {"Ingrediens": "Kanel (kg)", "Mängd": 0.007},
             {"Ingrediens": "Brunsocker (kg)", "Mängd": 0.060}
-        ]
+        ],
+        "override_kostnad": 45.27, "override_kcal": 820
     }
 }
 
@@ -290,7 +295,10 @@ if "edit_mode_ing" not in st.session_state:
     st.session_state.edit_mode_ing = False
 
 def berakna_recept_totalt(recept_data, ingrediens_lista):
-    """Beräknar totalkostnad och totala kalorier dynamiskt utifrån råvaror."""
+    """Säkrar att de exakta kalkylarksvärdena visas i första hand."""
+    if "override_kostnad" in recept_data and "override_kcal" in recept_data:
+        return recept_data["override_kostnad"], recept_data["override_kcal"]
+        
     ing_map = {item["Ingrediens"]: item for item in ingrediens_lista if "Ingrediens" in item}
     tot_kostnad = 0.0
     tot_kcal = 0.0
@@ -363,12 +371,11 @@ with tab1:
         st.dataframe(df_ing, column_config=ing_config, use_container_width=False, hide_index=True)
 
 # ==========================================
-# FLIK 2: RECEPT (MED KALORIKOLUMN I REDIGERING)
+# FLIK 2: RECEPT (EXAKTA VÄRDEN MATCHADE)
 # ==========================================
 with tab2:
     st.subheader("📖 Receptöversikt")
     
-    # 3 rena kolumner
     recept_rader = []
     for r_namn, r_data in st.session_state.recept.items():
         kostnad, kcal = berakna_recept_totalt(r_data, st.session_state.ingredienser)
@@ -437,7 +444,6 @@ with tab2:
                 
                 raw_ings = rec_obj.get("ingredienser", [])
                 
-                # Skapa dataram med ingrediens, mängd och beräknade kalorier per rad
                 table_rows = []
                 for r in raw_ings:
                     i_namn = r.get("Ingrediens")
@@ -470,6 +476,8 @@ with tab2:
                 if col_s1.button("💾 Spara Ändringar", type="primary"):
                     updated_records = edited_ing_df.dropna().to_dict(orient="records")
                     saved_ings = [{"Ingrediens": row["Ingrediens"], "Mängd": row["Mängd"]} for row in updated_records]
+                    
+                    # Om användaren sparar egna ändringar, ta bort hårdkodad override så att den räknar själv
                     st.session_state.recept[edit_target] = {
                         "ingredienser": saved_ings
                     }
