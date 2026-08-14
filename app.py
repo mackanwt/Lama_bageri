@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Bagerikalkylatorn", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Bagerikalkylatorn", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# MOBIL- OCH PWA-ANPASSNING FOR MOBILEN
+# MOBIL- OCH KOMPAKT LAYOUT-CSS
 # ==========================================
 st.markdown("""
     <head>
@@ -13,12 +13,23 @@ st.markdown("""
         <meta name="apple-mobile-web-app-title" content="BageriApp">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     </head>
+    <style>
+        /* Krymp radbredd och vaddering i tabeller */
+        div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
+            padding: 2px 8px !important;
+        }
+        /* Minska avstånd mellan element för mer kompakt vy */
+        .block-container {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
-st.title("🧁 Bagerikalkylatorn")
+st.title("🦙👨‍🍳🥖 Bagerikalkylatorn")
 
 # ==========================================
-# 1. INITIALISERERING AV DATA (FRÅN DITT KALKYLARK)
+# 1. INITIALISERING AV DATA
 # ==========================================
 DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 50},
@@ -77,15 +88,29 @@ if "ingredienser" not in st.session_state:
 if "order_rader" not in st.session_state:
     st.session_state.order_rader = []
 
+if "edit_mode_ing" not in st.session_state:
+    st.session_state.edit_mode_ing = False
+
 tab1, tab2, tab3 = st.tabs(["🥦 Ingredienser", "📖 Recept", "🛒 Orderbyggare"])
 
 # ==========================================
 # FLIK 1: INGREDIENSBIBLIOTEK
 # ==========================================
 with tab1:
-    st.subheader("🥦 Ingrediensbibliotek")
-    
-    with st.expander("➕ Lägg till / Redigera Ingrediens"):
+    col_head, col_btn = st.columns([3, 1])
+    with col_head:
+        st.subheader("🥦 Ingrediensbibliotek")
+    with col_btn:
+        if st.session_state.edit_mode_ing:
+            if st.button("💾 Spara & Lås tabell", type="primary", use_container_width=True):
+                st.session_state.edit_mode_ing = False
+                st.rerun()
+        else:
+            if st.button("✏️ Aktivera Redigering", use_container_width=True):
+                st.session_state.edit_mode_ing = True
+                st.rerun()
+
+    with st.expander("➕ Lägg till ny ingrediens"):
         i_namn = st.text_input("Ingrediensnamn (t.ex. Pecannötter (kg))")
         col_p1, col_p2, col_p3 = st.columns(3)
         i_pris = col_p1.number_input("Pris (SEK)", min_value=0.0, step=1.0)
@@ -104,7 +129,19 @@ with tab1:
                 st.rerun()
 
     df_ing = pd.DataFrame(st.session_state.ingredienser)
-    st.dataframe(df_ing, use_container_width=True, hide_index=True)
+
+    if st.session_state.edit_mode_ing:
+        st.info("💡 **Redigeringsläge:** Du kan ändra namn, priser, enheter och kalorier direkt i cellerna nedan.")
+        edited_df = st.data_editor(
+            df_ing,
+            use_container_width=True,
+            hide_index=True,
+            num_rows="dynamic",
+            key="ing_editor"
+        )
+        st.session_state.ingredienser = edited_df.to_dict(orient="records")
+    else:
+        st.dataframe(df_ing, use_container_width=True, hide_index=True)
 
 # ==========================================
 # FLIK 2: RECEPTÖVERSIKT
@@ -138,7 +175,7 @@ with tab3:
         valgt_recept = st.selectbox("Välj Recept", list(DEFAULT_RECEPT.keys()))
         
         # Toppings val från ingredienslistan
-        ing_namn_lista = ["Ingen"] + [i["Ingrediens"] for i in st.session_state.ingredienser]
+        ing_namn_lista = ["Ingen"] + [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
         valgd_topping = st.selectbox("Topping / Extra Ingrediens", ing_namn_lista)
         
         topping_mangd = 0.0
@@ -157,11 +194,11 @@ with tab3:
     topping_kostnad = 0.0
     topping_kcal = 0
     if valgd_topping != "Ingen":
-        ing_info = next((item for item in st.session_state.ingredienser if item["Ingrediens"] == valgd_topping), None)
+        ing_info = next((item for item in st.session_state.ingredienser if item.get("Ingrediens") == valgd_topping), None)
         if ing_info:
             faktor = topping_mangd / 1000.0 if topping_enhet == "g" else topping_mangd
-            topping_kostnad = ing_info["Pris"] * faktor
-            topping_kcal = ing_info["Kalorier"] * faktor
+            topping_kostnad = float(ing_info.get("Pris", 0)) * faktor
+            topping_kcal = float(ing_info.get("Kalorier", 0)) * faktor
 
     if st.button("➕ Lägg till rad i ordern", type="primary"):
         bas_k = DEFAULT_RECEPT[valgt_recept]["bas_kostnad"]
@@ -188,7 +225,7 @@ with tab3:
     # Visa Orderöversikt
     if st.session_state.order_rader:
         st.markdown("---")
-        st.markdown(f"### 📋 Summary: {order_namn}")
+        st.markdown(f"### 📋 Översikt: {order_namn}")
         
         df_order = pd.DataFrame(st.session_state.order_rader)
         st.dataframe(df_order, use_container_width=True, hide_index=True)
