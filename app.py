@@ -4,9 +4,46 @@ import pandas as pd
 st.set_page_config(page_title="Bagerikalkylatorn", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# MOBIL- OCH KOMPAKT LAYOUT-CSS
+# KOMPAKT CSS & TEKNAD LAMA-LOGOTYP (SVG)
 # ==========================================
-st.markdown("""
+LLAMA_LOGO_SVG = """
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="55" height="55" style="vertical-align: middle; margin-right: 12px;">
+  <!-- Kavel bakom/under hakan -->
+  <rect x="15" y="74" width="70" height="8" rx="3" fill="#d2b48c" stroke="#8b5a2b" stroke-width="2"/>
+  <rect x="5" y="75" width="10" height="6" rx="2" fill="#8b5a2b"/>
+  <rect x="85" y="75" width="10" height="6" rx="2" fill="#8b5a2b"/>
+  
+  <!-- Öron -->
+  <ellipse cx="30" cy="38" rx="6" ry="16" fill="#fdfbf7" stroke="#d0c0b0" stroke-width="2" transform="rotate(-15 30 38)"/>
+  <ellipse cx="70" cy="38" rx="6" ry="16" fill="#fdfbf7" stroke="#d0c0b0" stroke-width="2" transform="rotate(15 70 38)"/>
+  <ellipse cx="30" cy="38" rx="3" ry="10" fill="#f0e6df" transform="rotate(-15 30 38)"/>
+  <ellipse cx="70" cy="38" rx="3" ry="10" fill="#f0e6df" transform="rotate(15 70 38)"/>
+  
+  <!-- Huvud -->
+  <path d="M 33,45 C 33,32 67,32 67,45 C 67,65 62,76 50,76 C 38,76 33,65 33,45 Z" fill="#fdfbf7" stroke="#d0c0b0" stroke-width="2"/>
+  
+  <!-- Mulle / Nos -->
+  <ellipse cx="50" cy="62" rx="10" ry="8" fill="#f0e6df" stroke="#d0c0b0" stroke-width="1"/>
+  <path d="M 46,59 L 54,59 L 50,63 Z" fill="#8b5a2b"/>
+  <path d="M 50,63 L 50,67" stroke="#8b5a2b" stroke-width="1.5"/>
+  
+  <!-- Ögon -->
+  <circle cx="42" cy="50" r="3.5" fill="#2c2c2c"/>
+  <circle cx="58" cy="50" r="3.5" fill="#2c2c2c"/>
+  <circle cx="43.5" cy="48.5" r="1.2" fill="#ffffff"/>
+  <circle cx="59.5" cy="48.5" r="1.2" fill="#ffffff"/>
+  
+  <!-- Kinder -->
+  <ellipse cx="37" cy="56" rx="3.5" ry="2" fill="#ffb6c1" opacity="0.6"/>
+  <ellipse cx="63" cy="56" rx="3.5" ry="2" fill="#ffb6c1" opacity="0.6"/>
+  
+  <!-- Kockhatt -->
+  <path d="M 36,32 C 28,18 40,8 50,10 C 60,8 72,18 64,32 Z" fill="#ffffff" stroke="#cccccc" stroke-width="2"/>
+  <rect x="35" y="30" width="30" height="8" rx="2" fill="#ffffff" stroke="#cccccc" stroke-width="1.5"/>
+</svg>
+"""
+
+st.markdown(f"""
     <head>
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,22 +51,34 @@ st.markdown("""
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     </head>
     <style>
-        /* Krymp radbredd och vaddering i tabeller */
-        div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
-            padding: 2px 8px !important;
-        }
-        /* Minska avstånd mellan element för mer kompakt vy */
-        .block-container {
-            padding-top: 2rem !important;
-            padding-bottom: 2rem !important;
-        }
+        /* Krymp vaddering och höjd på rader i alla tabeller */
+        div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {{
+            padding: 2px 10px !important;
+            font-size: 14px !important;
+        }}
+        .block-container {{
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+            max-width: 1000px !important;
+        }}
+        .main-header {{
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }}
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🦙👨‍🍳🥖 Bagerikalkylatorn")
+# Rubrik med den tecknade lamalogo
+st.markdown(f"""
+    <div class="main-header">
+        {LLAMA_LOGO_SVG}
+        <h1 style="display: inline; margin: 0; vertical-align: middle;">Bagerikalkylatorn</h1>
+    </div>
+""", unsafe_allow_html=True)
 
 # ==========================================
-# 1. INITIALISERING AV DATA
+# 1. DATA-INITIALISERING
 # ==========================================
 DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 50},
@@ -93,6 +142,14 @@ if "edit_mode_ing" not in st.session_state:
 
 tab1, tab2, tab3 = st.tabs(["🥦 Ingredienser", "📖 Recept", "🛒 Orderbyggare"])
 
+# Kolumnkonfiguration för kompakt visning i Ingrediens-fliken
+ing_col_config = {
+    "Ingrediens": st.column_config.TextColumn("Ingrediens", width="medium"),
+    "Pris": st.column_config.NumberColumn("Pris (kr)", format="%.2f kr", width="small"),
+    "Enhet": st.column_config.TextColumn("Enhet", width="small"),
+    "Kalorier": st.column_config.NumberColumn("Kalorier", format="%d kcal", width="small"),
+}
+
 # ==========================================
 # FLIK 1: INGREDIENSBIBLIOTEK
 # ==========================================
@@ -131,17 +188,23 @@ with tab1:
     df_ing = pd.DataFrame(st.session_state.ingredienser)
 
     if st.session_state.edit_mode_ing:
-        st.info("💡 **Redigeringsläge:** Du kan ändra namn, priser, enheter och kalorier direkt i cellerna nedan.")
+        st.info("💡 **Redigeringsläge:** Ändra värden direkt i cellerna nedan.")
         edited_df = st.data_editor(
             df_ing,
-            use_container_width=True,
+            column_config=ing_col_config,
+            use_container_width=False,
             hide_index=True,
             num_rows="dynamic",
             key="ing_editor"
         )
         st.session_state.ingredienser = edited_df.to_dict(orient="records")
     else:
-        st.dataframe(df_ing, use_container_width=True, hide_index=True)
+        st.dataframe(
+            df_ing,
+            column_config=ing_col_config,
+            use_container_width=False,
+            hide_index=True
+        )
 
 # ==========================================
 # FLIK 2: RECEPTÖVERSIKT
@@ -157,10 +220,14 @@ with tab2:
             "Kostnad/st": f"{(v['bas_kostnad'] / v['sats_antal']):.2f} kr",
             "Kalorier/st": f"{int(v['kcal_sats'] / v['sats_antal'])} kcal"
         })
-    st.dataframe(pd.DataFrame(recept_data), use_container_width=True, hide_index=True)
+    st.dataframe(
+        pd.DataFrame(recept_data),
+        use_container_width=False,
+        hide_index=True
+    )
 
 # ==========================================
-# FLIK 3: ORDERBYGGARE (Som Order 11-morfar)
+# FLIK 3: ORDERBYGGARE (Order 11-morfar stil)
 # ==========================================
 with tab3:
     st.subheader("🛒 Bygg Order (ex. Order 11-morfar)")
@@ -174,7 +241,6 @@ with tab3:
     with col_a:
         valgt_recept = st.selectbox("Välj Recept", list(DEFAULT_RECEPT.keys()))
         
-        # Toppings val från ingredienslistan
         ing_namn_lista = ["Ingen"] + [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
         valgd_topping = st.selectbox("Topping / Extra Ingrediens", ing_namn_lista)
         
@@ -190,7 +256,6 @@ with tab3:
         salda_st = st.number_input("Sålda (st)", min_value=1, value=18)
         pris_per_st = st.number_input("Pris / cookie (kr)", min_value=0.0, value=15.0, step=1.0)
 
-    # Beräkna topping-kostnad
     topping_kostnad = 0.0
     topping_kcal = 0
     if valgd_topping != "Ingen":
@@ -222,7 +287,6 @@ with tab3:
             "Kalorier/st": int((bas_kcal + topping_kcal) / bakade_st)
         })
 
-    # Visa Orderöversikt
     if st.session_state.order_rader:
         st.markdown("---")
         st.markdown(f"### 📋 Översikt: {order_namn}")
