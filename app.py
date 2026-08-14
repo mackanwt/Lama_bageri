@@ -151,7 +151,6 @@ DEFAULT_RECEPT = {
     "Cinnamon loaf": {"override_kostnad": 45.27, "override_kcal": 820}
 }
 
-# ALLA DINA 5 ORDRAR FÖRINLAGDA
 DEFAULT_ORDERS = {
     "Order 7-Eivor": {
         "datum": "2026-04-29/2026-05-15",
@@ -248,7 +247,7 @@ with tab4:
     valj_order_nycklar = list(st.session_state.orders_db.keys())
     valj_order = st.selectbox("📋 Välj order att granska eller redigera:", valj_order_nycklar)
 
-     nuvarande_order = st.session_state.orders_db[valj_order]
+    nuvarande_order = st.session_state.orders_db[valj_order]
     
     st.markdown(f"### {valj_order}")
     st.caption(f"Datum: {nuvarande_order['datum']}")
