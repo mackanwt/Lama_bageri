@@ -4,42 +4,47 @@ import pandas as pd
 st.set_page_config(page_title="Bagerikalkylatorn", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# TEKNAD LAMA-LOGOTYP (SVG med Outlines) & CSS
+# OUTLINE LAMA-LOGOTYP (MED KOCKHATT & KAVEL)
 # ==========================================
-LLAMA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="60" height="60" style="vertical-align: middle;">
-  <!-- Kavel -->
-  <g stroke="#2c2c2c" stroke-width="2.5" fill="#e8c29b" stroke-linejoin="round">
-    <rect x="20" y="92" width="80" height="10" rx="4"/>
-    <rect x="10" y="94" width="10" height="6" rx="2" fill="#b88b5c"/>
-    <rect x="100" y="94" width="10" height="6" rx="2" fill="#b88b5c"/>
+LLAMA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="70" height="70" style="vertical-align: middle;">
+  <!-- Kavel undertill -->
+  <g stroke="#2c2c2c" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="35" y="162" width="130" height="16" rx="6" fill="#e5bf92"/>
+    <rect x="15" y="166" width="20" height="8" rx="3" fill="#b38150"/>
+    <rect x="165" y="166" width="20" height="8" rx="3" fill="#b38150"/>
   </g>
   <!-- Öron -->
-  <g stroke="#2c2c2c" stroke-width="2.5" fill="#fcf8f2">
-    <ellipse cx="38" cy="38" rx="7" ry="18" transform="rotate(-20 38 38)"/>
-    <ellipse cx="82" cy="38" rx="7" ry="18" transform="rotate(20 82 38)"/>
+  <g stroke="#2c2c2c" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M 52,58 C 30,30 50,10 62,38 Z" fill="#ffffff"/>
+    <path d="M 148,58 C 170,30 150,10 138,38 Z" fill="#ffffff"/>
+    <path d="M 54,52 C 40,34 52,22 60,38 Z" fill="#f4c2c2"/>
+    <path d="M 146,52 C 160,34 148,22 140,38 Z" fill="#f4c2c2"/>
   </g>
-  <ellipse cx="38" cy="38" rx="3.5" ry="11" fill="#f2c4ce" transform="rotate(-20 38 38)"/>
-  <ellipse cx="82" cy="38" rx="3.5" ry="11" fill="#f2c4ce" transform="rotate(20 82 38)"/>
-  <!-- Huvud & Hals -->
-  <path d="M 42,48 C 30,48 35,88 42,88 L 78,88 C 85,88 90,48 78,48 Z" fill="#fcf8f2" stroke="#2c2c2c" stroke-width="2.5"/>
-  <!-- Lockigt Fluff-hår -->
-  <path d="M 40,42 C 38,36 44,32 48,35 C 52,30 60,30 63,35 C 68,32 75,36 73,42 C 77,46 72,52 68,50 C 65,54 55,54 52,50 C 48,52 43,46 40,42 Z" fill="#fcf8f2" stroke="#2c2c2c" stroke-width="2.5"/>
-  <!-- Mulle/Nos -->
-  <ellipse cx="60" cy="68" rx="11" ry="8" fill="#f5e5d3" stroke="#2c2c2c" stroke-width="2"/>
-  <path d="M 55,65 C 57,63 63,63 65,65 C 65,68 60,71 60,71 C 60,71 55,68 55,65 Z" fill="#f2c4ce" stroke="#2c2c2c" stroke-width="1.5"/>
-  <path d="M 60,71 L 60,74 M 57,74 Q 60,76 63,74" stroke="#2c2c2c" stroke-width="1.5" fill="none"/>
-  <!-- Ögon -->
-  <ellipse cx="48" cy="58" rx="4.5" ry="5.5" fill="#2c2c2c"/>
-  <ellipse cx="72" cy="58" rx="4.5" ry="5.5" fill="#2c2c2c"/>
-  <circle cx="46.5" cy="56" r="1.8" fill="#ffffff"/>
-  <circle cx="70.5" cy="56" r="1.8" fill="#ffffff"/>
-  <!-- Kinder -->
-  <ellipse cx="42" cy="66" rx="4" ry="2.5" fill="#f2a7b3" opacity="0.7"/>
-  <ellipse cx="78" cy="66" rx="4" ry="2.5" fill="#f2a7b3" opacity="0.7"/>
-  <!-- Kockhatt -->
-  <g stroke="#2c2c2c" stroke-width="2.5" fill="#ffffff">
-    <path d="M 44,28 C 36,12 52,4 60,8 C 68,4 84,12 76,28 Z"/>
-    <rect x="43" y="26" width="34" height="8" rx="2" fill="#ffffff"/>
+  <!-- Luddig Huvudform (Molnlinjer) -->
+  <path d="M 60,65 C 40,65 35,90 40,110 C 45,130 55,148 100,148 C 145,148 155,130 160,110 C 165,90 160,65 140,65 C 135,65 130,55 120,55 C 110,55 105,62 100,62 C 95,62 90,55 80,55 C 70,55 65,65 60,65 Z" fill="#ffffff" stroke="#2c2c2c" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Mulle / Nosparti -->
+  <ellipse cx="100" cy="115" rx="22" ry="16" fill="#fdf0ed" stroke="#2c2c2c" stroke-width="3"/>
+  <path d="M 90,108 Q 100,102 110,108 Q 100,118 90,108 Z" fill="#f4c2c2" stroke="#2c2c2c" stroke-width="2.5"/>
+  <path d="M 100,114 L 100,122 M 94,122 Q 100,126 106,122" stroke="#2c2c2c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Stora sota ogon m ögonfransar -->
+  <g>
+    <circle cx="72" cy="92" r="10" fill="#2c2c2c"/>
+    <circle cx="128" cy="92" r="10" fill="#2c2c2c"/>
+    <circle cx="69" cy="88" r="4" fill="#ffffff"/>
+    <circle cx="125" cy="88" r="4" fill="#ffffff"/>
+    <circle cx="74" cy="95" r="2" fill="#ffffff"/>
+    <circle cx="130" cy="95" r="2" fill="#ffffff"/>
+    <!-- Ögonfransar -->
+    <path d="M 62,86 Q 56,80 54,84 M 64,82 Q 60,74 60,80" stroke="#2c2c2c" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 138,86 Q 144,80 146,84 M 136,82 Q 140,74 140,80" stroke="#2c2c2c" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <!-- Pärlrosa kinder -->
+  <ellipse cx="60" cy="110" rx="8" ry="5" fill="#f8b195" opacity="0.85"/>
+  <ellipse cx="140" cy="110" rx="8" ry="5" fill="#f8b195" opacity="0.85"/>
+  <!-- Helt täckande Kockhatt -->
+  <g stroke="#2c2c2c" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M 68,40 C 50,15 80,0 100,8 C 120,0 150,15 132,40 Z" fill="#ffffff"/>
+    <rect x="66" y="36" width="68" height="16" rx="4" fill="#ffffff"/>
   </g>
 </svg>"""
 
@@ -54,28 +59,18 @@ st.markdown("""
             padding-bottom: 1.2rem !important;
             max-width: 900px !important;
         }
-        .header-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        .header-box h1 {
-            margin: 0;
-            font-size: 2rem;
-        }
     </style>
 """, unsafe_allow_html=True)
 
-# Sidhuvud utan HTML-fel
-col_logo, col_title = st.columns([1, 8])
+# Sidhuvud med logotyp
+col_logo, col_title = st.columns([1, 7])
 with col_logo:
     st.markdown(LLAMA_SVG, unsafe_allow_html=True)
 with col_title:
     st.title("Bagerikalkylatorn")
 
 # ==========================================
-# 1. INITIALISERING AV INGREDIENSER OCH RECEPT
+# 1. INITIALISERING AV INGREDIENSER OCH ALLA RECEPT
 # ==========================================
 DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 50},
@@ -114,34 +109,99 @@ DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Yoghurt (kg)", "Pris": 28.50, "Enhet": "kg", "Kalorier": 600}
 ]
 
+# Alla 11 recept från kalkylarket med ingående råvaror
 DEFAULT_RECEPT = {
     "Muffins": {
-        "sats_antal": 22,
         "ingredienser": [
-            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.5},
-            {"Ingrediens": "Socker (kg)", "Mängd": 0.3},
-            {"Ingrediens": "Smör (kg)", "Mängd": 0.2},
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.500},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.300},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.200},
             {"Ingrediens": "Egg (st)", "Mängd": 3}
         ]
     },
     "Biskvier": {
-        "sats_antal": 18,
         "ingredienser": [
-            {"Ingrediens": "Mandel (kg)", "Mängd": 0.25},
-            {"Ingrediens": "Florsocker (kg)", "Mängd": 0.3},
-            {"Ingrediens": "Smör (kg)", "Mängd": 0.2},
-            {"Ingrediens": "Bakchoklad mörk (kg)", "Mängd": 0.15}
+            {"Ingrediens": "Mandel (kg)", "Mängd": 0.250},
+            {"Ingrediens": "Florsocker (kg)", "Mängd": 0.300},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Bakchoklad mörk (kg)", "Mängd": 0.150}
+        ]
+    },
+    "Oat cookie": {
+        "ingredienser": [
+            {"Ingrediens": "Havregryn (kg)", "Mängd": 0.400},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.250},
+            {"Ingrediens": "Brunsocker (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.200}
         ]
     },
     "Kanelbullar": {
-        "sats_antal": 40,
         "ingredienser": [
-            {"Ingrediens": "Mjöl (kg)", "Mängd": 1.0},
-            {"Ingrediens": "Mjölk (kg)", "Mängd": 0.5},
-            {"Ingrediens": "Smör (kg)", "Mängd": 0.2},
-            {"Ingrediens": "Socker (kg)", "Mängd": 0.15},
-            {"Ingrediens": "Jäst (kg)", "Mängd": 0.05},
-            {"Ingrediens": "Kanel (kg)", "Mängd": 0.02}
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 1.000},
+            {"Ingrediens": "Mjölk (kg)", "Mängd": 0.500},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.150},
+            {"Ingrediens": "Jäst (kg)", "Mängd": 0.050},
+            {"Ingrediens": "Kanel (kg)", "Mängd": 0.020}
+        ]
+    },
+    "Cookie": {
+        "ingredienser": [
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.350},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Brunsocker (kg)", "Mängd": 0.150},
+            {"Ingrediens": "Chokladknappar (kg)", "Mängd": 0.100}
+        ]
+    },
+    "Brownie": {
+        "ingredienser": [
+            {"Ingrediens": "Bakchoklad mörk (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.300},
+            {"Ingrediens": "Egg (st)", "Mängd": 4},
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.150}
+        ]
+    },
+    "Bagels": {
+        "ingredienser": [
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.800},
+            {"Ingrediens": "Jäst (kg)", "Mängd": 0.025},
+            {"Ingrediens": "Honung (kg)", "Mängd": 0.030},
+            {"Ingrediens": "Salt (kg)", "Mängd": 0.015}
+        ]
+    },
+    "Morotskaka": {
+        "ingredienser": [
+            {"Ingrediens": "Morot (kg)", "Mängd": 0.400},
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.300},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.300},
+            {"Ingrediens": "Olja (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Färskost (kg)", "Mängd": 0.150}
+        ]
+    },
+    "Chokladkaka": {
+        "ingredienser": [
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.400},
+            {"Ingrediens": "Kakao (kg)", "Mängd": 0.100},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.400},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.250},
+            {"Ingrediens": "Vispgrädde (kg)", "Mängd": 0.200}
+        ]
+    },
+    "Orange cake": {
+        "ingredienser": [
+            {"Ingrediens": "Apelsin (st)", "Mängd": 2},
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.250},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.200},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.150}
+        ]
+    },
+    "Cinnamon loaf": {
+        "ingredienser": [
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.500},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.150},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.150},
+            {"Ingrediens": "Kanel (kg)", "Mängd": 0.025}
         ]
     }
 }
@@ -159,7 +219,7 @@ if "edit_mode_ing" not in st.session_state:
     st.session_state.edit_mode_ing = False
 
 def berakna_recept_totalt(recept_data, ingrediens_lista):
-    """Beräknar total kostnad och totala kalorier dynamiskt utifrån valda ingredienser."""
+    """Beräknar total kostnad och totala kalorier per recept utifrån valda råvaror."""
     ing_map = {item["Ingrediens"]: item for item in ingrediens_lista if "Ingrediens" in item}
     tot_kostnad = 0.0
     tot_kcal = 0.0
@@ -232,12 +292,12 @@ with tab1:
         st.dataframe(df_ing, column_config=ing_config, use_container_width=False, hide_index=True)
 
 # ==========================================
-# FLIK 2: RECEPT (ÖVERSIKT, LÄGG TILL, REDIGERA)
+# FLIK 2: RECEPT (FÖRENKLAD 3-KOLUMNSÖVERSIKT)
 # ==========================================
 with tab2:
     st.subheader("📖 Receptöversikt")
     
-    # 3 rena kolumner
+    # 3 rena kolumner exakt som begärt
     recept_rader = []
     for r_namn, r_data in st.session_state.recept.items():
         kostnad, kcal = berakna_recept_totalt(r_data, st.session_state.ingredienser)
@@ -266,8 +326,6 @@ with tab2:
     with col_act1:
         with st.expander("➕ Lägg till recept", expanded=False):
             nytt_namn = st.text_input("Receptnamn", key="nytt_rec_namn")
-            sats_antal = st.number_input("Antal bakverk per sats (st)", min_value=1, value=12, key="nytt_rec_sats")
-            
             all_ing_names = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
             
             st.markdown("**Välj ingredienser:**")
@@ -289,7 +347,6 @@ with tab2:
             if st.button("💾 Spara Recept", type="primary"):
                 if nytt_namn and st.session_state.temp_ing:
                     st.session_state.recept[nytt_namn] = {
-                        "sats_antal": sats_antal,
                         "ingredienser": st.session_state.temp_ing
                     }
                     st.session_state.temp_ing = []
@@ -300,11 +357,11 @@ with tab2:
     with col_act2:
         with st.expander("✏️ Redigera recept", expanded=False):
             recept_lista = list(st.session_state.recept.keys())
+            all_ing_names = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
+            
             if recept_lista:
                 edit_target = st.selectbox("Välj recept att redigera", recept_lista)
                 rec_obj = st.session_state.recept[edit_target]
-                
-                edit_sats = st.number_input("Antal/sats (st)", min_value=1, value=rec_obj.get("sats_antal", 12), key="edit_sats_num")
                 
                 current_ings = pd.DataFrame(rec_obj.get("ingredienser", []))
                 if current_ings.empty:
@@ -326,7 +383,6 @@ with tab2:
                 if col_s1.button("💾 Spara Ändringar", type="primary"):
                     updated_ings = edited_ing_df.dropna().to_dict(orient="records")
                     st.session_state.recept[edit_target] = {
-                        "sats_antal": edit_sats,
                         "ingredienser": updated_ings
                     }
                     st.success(f"Uppdaterade '{edit_target}'!")
