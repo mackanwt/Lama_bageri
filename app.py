@@ -5,35 +5,99 @@ import os
 st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# VISNING AV LOGOTYP FRÅN BILD
+# MYSIG OCH BRED DESIGN (CSS)
 # ==========================================
-col_left, col_logo, col_right = st.columns([2, 1, 2])
-with col_logo:
-    if os.path.exists("Logga.jpg"):
-        st.image("Logga.jpg", width=220)
-    elif os.path.exists("Logga.png"):
-        st.image("Logga.png", width=220)
-    else:
-        st.info("💡 Placera filen 'Logga.jpg' i samma mapp som app.py för att visa logotypen.")
-
 st.markdown("""
     <style>
-        div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
-            padding: 4px 8px !important;
-            font-size: 13px !important;
+        /* Bakgrund & Huvudlayout */
+        .stApp {
+            background-color: #FAF6F0;
+            color: #3C2A21;
         }
         .block-container {
-            padding-top: 1.0rem !important;
-            padding-bottom: 1.0rem !important;
-            max-width: 1200px !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 2.0rem !important;
+            padding-left: 2.0rem !important;
+            padding-right: 2.0rem !important;
+            max-width: 98% !important; /* Gör appen bredare för att slippa horisontell scroll */
+        }
+        
+        /* Knappar */
+        .stButton>button {
+            border-radius: 12px !important;
+            background-color: #D9826C !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 1rem !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        .stButton>button:hover {
+            background-color: #C86D51 !important;
+            color: #FFFFFF !important;
+            transform: translateY(-1px);
+        }
+
+        /* Flikar */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+        }
+        .stTabs [data-baseweb="tab"] {
+            border-radius: 10px 10px 0 0;
+            padding: 8px 16px;
+            background-color: #EFE6DC;
+            color: #5C4033;
+            font-weight: 600;
+        }
+        .stTabs [aria-selected="true"] {
+            background-color: #D9826C !important;
+            color: #FFFFFF !important;
+        }
+
+        /* Expander & Kort */
+        .streamlit-expanderHeader {
+            background-color: #F3E9DF !important;
+            border-radius: 10px !important;
+            color: #4A3525 !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Bild-behållare så loggan inte kapas */
+        div[data-testid="stImage"] {
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+        div[data-testid="stImage"] img {
+            max-height: 220px;
+            object-fit: contain;
+        }
+
+        /* Tabelljusteringar */
+        div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
+            padding: 6px 10px !important;
+            font-size: 13.5px !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
+# ==========================================
+# LOGOTYP VISNING (SÄKRAD MOT KAPNING)
+# ==========================================
+c_left, c_logo, c_right = st.columns([2, 1.2, 2])
+with c_logo:
+    if os.path.exists("Logga.jpg"):
+        st.image("Logga.jpg")
+    elif os.path.exists("Logga.png"):
+        st.image("Logga.png")
+    else:
+        st.info("💡 Placera filen 'Logga.jpg' i samma mapp som app.py på GitHub för att visa logotypen.")
+
 st.markdown("---")
 
 # ==========================================
-# INGREDIENSER, TOPPINGS OCH RECEPTDATA
+# DEFAULT DATA
 # ==========================================
 DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 40},
@@ -95,42 +159,42 @@ DEFAULT_ORDERS = {
     "Order 7-Eivor": {
         "datum": "2026-04-29/2026-05-15",
         "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
-            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0},
-            {"Recept": "Cookie", "Topping": "Kokosflingor (kg)", "Mängd_g": 100, "Satser": 1, "Bakade": 25, "Sålda": 24, "Pris_st": 10.0},
-            {"Recept": "Oat cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 150, "Satser": 1, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0},
-            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1, "Bakade": 18, "Sålda": 18, "Pris_st": 20.0},
-            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1, "Bakade": 38, "Sålda": 36, "Pris_st": 10.0}
+            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
+            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0},
+            {"Recept": "Cookie", "Topping": "Kokosflingor (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 25, "Sålda": 24, "Pris_st": 10.0},
+            {"Recept": "Oat cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 150, "Satser": 1.0, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0},
+            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 18, "Sålda": 18, "Pris_st": 20.0},
+            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 38, "Sålda": 36, "Pris_st": 10.0}
         ]
     },
     "Order 8-mamma": {
         "datum": "2026-04-29/2026-05-15",
         "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
+            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
             {"Recept": "Cinnamon loaf", "Topping": "Ingen", "Mängd_g": 0, "Satser": 0.5, "Bakade": 1, "Sålda": 1, "Pris_st": 70.0},
-            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0}
+            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0}
         ]
     },
     "Order 9-Pappa": {
         "datum": "2026-06-02",
         "rader": [
-            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1, "Bakade": 34, "Sålda": 25, "Pris_st": 10.0}
+            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 34, "Sålda": 25, "Pris_st": 10.0}
         ]
     },
     "Order 10-mamma": {
         "datum": "2026-06-13",
         "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0},
-            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1, "Bakade": 18, "Sålda": 17, "Pris_st": 20.0},
-            {"Recept": "Orange cake", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1, "Bakade": 1, "Sålda": 1, "Pris_st": 120.0}
+            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0},
+            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 18, "Sålda": 17, "Pris_st": 20.0},
+            {"Recept": "Orange cake", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 1, "Sålda": 1, "Pris_st": 120.0}
         ]
     },
     "Order 11-morfar": {
         "datum": "2026-06-13",
         "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0},
-            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1, "Bakade": 17, "Sålda": 17, "Pris_st": 20.0},
-            {"Recept": "Oat cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 150, "Satser": 1, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0}
+            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0},
+            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 17, "Sålda": 17, "Pris_st": 20.0},
+            {"Recept": "Oat cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 150, "Satser": 1.0, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0}
         ]
     }
 }
@@ -153,7 +217,9 @@ def berakna_recept_totalt(r_namn):
         return r_data["override_kostnad"], r_data["override_kcal"]
     return 50.0, 4000
 
+# ==========================================
 # FLIKAR
+# ==========================================
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
 with tab1:
@@ -186,26 +252,34 @@ with tab4:
     st.markdown(f"### {valj_order}")
     st.caption(f"Datum: {nuvarande_order['datum']}")
 
-    with st.expander("➕ Lägg till rad i denna order", expanded=False):
-        c1, c2, c3 = st.columns(3)
-        sel_rec = c1.selectbox("Huvudrecept", list(st.session_state.recept.keys()))
-        valbara_toppings = ["Ingen"] + st.session_state.toppings_lista
-        sel_top = c2.selectbox("Topping", valbara_toppings)
-        top_mngd = c3.number_input("Mängd (g)", min_value=0, value=100 if sel_top != "Ingen" else 0)
+    # ------------------------------------------
+    # REDIGERING DIREKT I CELLER (DATA EDITOR)
+    # ------------------------------------------
+    with st.expander("✏️ Redigera orderrader direkt i tabellen", expanded=True):
+        df_edit = pd.DataFrame(nuvarande_order["rader"])
         
-        c4, c5, c6 = st.columns(3)
-        sats = c4.number_input("Satser", min_value=0.1, value=1.0, step=0.5)
-        bakade = c5.number_input("Bakade (st)", min_value=1, value=20)
-        salda = c6.number_input("Sålda (st)", min_value=1, value=20)
-        pris = st.number_input("Pris/cookie (kr)", min_value=0.0, value=15.0)
+        edited_df = st.data_editor(
+            df_edit,
+            num_rows="dynamic",
+            use_container_width=True,
+            column_config={
+                "Recept": st.column_config.SelectboxColumn("Recept", options=list(st.session_state.recept.keys()), required=True),
+                "Topping": st.column_config.SelectboxColumn("Topping", options=["Ingen"] + st.session_state.toppings_lista, required=True),
+                "Mängd_g": st.column_config.NumberColumn("Mängd (g)", min_value=0, step=10),
+                "Satser": st.column_config.NumberColumn("Satser", min_value=0.1, step=0.1, format="%.1f"),
+                "Bakade": st.column_config.NumberColumn("Bakade (st)", min_value=1, step=1),
+                "Sålda": st.column_config.NumberColumn("Sålda (st)", min_value=0, step=1),
+                "Pris_st": st.column_config.NumberColumn("Pris/st (kr)", min_value=0.0, step=0.5, format="%.1f kr")
+            },
+            key=f"editor_{valj_order}"
+        )
+        
+        # Spara automatiskt ändringar från cellerna
+        nuvarande_order["rader"] = edited_df.to_dict(orient="records")
 
-        if st.button("➕ Spara rad i ordern"):
-            nuvarande_order["rader"].append({
-                "Recept": sel_rec, "Topping": sel_top, "Mängd_g": top_mngd,
-                "Satser": sats, "Bakade": bakade, "Sålda": salda, "Pris_st": pris
-            })
-            st.rerun()
-
+    # ------------------------------------------
+    # BERÄKNA & FÄRGKODA SAMMANSTÄLLNING
+    # ------------------------------------------
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser}
     table_rows = []
     
@@ -217,20 +291,23 @@ with tab4:
     tot_kalorier_sats = 0
 
     for r in nuvarande_order["rader"]:
-        rec_k, rec_kcal = berakna_recept_totalt(r["Recept"])
+        rec_k, rec_kcal = berakna_recept_totalt(r.get("Recept", "Muffins"))
         
         top_k = 0.0
         top_kcal = 0
-        if r["Topping"] != "Ingen" and r["Topping"] in ing_map:
-            t_info = ing_map[r["Topping"]]
-            faktor = r["Mängd_g"] / 1000.0
+        topping_namn = r.get("Topping", "Ingen")
+        mängd_g = r.get("Mängd_g", 0)
+        
+        if topping_namn != "Ingen" and topping_namn in ing_map:
+            t_info = ing_map[topping_namn]
+            faktor = mängd_g / 1000.0
             top_k = t_info["Pris"] * faktor
             top_kcal = int(t_info["Kalorier"] * faktor)
 
-        rad_satser = r["Satser"]
-        rad_bakade = r["Bakade"]
-        rad_salda = r["Sålda"]
-        rad_pris_st = r["Pris_st"]
+        rad_satser = float(r.get("Satser", 1.0))
+        rad_bakade = int(r.get("Bakade", 1))
+        rad_salda = int(r.get("Sålda", 0))
+        rad_pris_st = float(r.get("Pris_st", 0.0))
 
         rad_tot_kostnad = (rec_k * rad_satser) + top_k
         rad_kostnad_bakad = rad_tot_kostnad / rad_bakade if rad_bakade > 0 else 0
@@ -251,9 +328,9 @@ with tab4:
         tot_kalorier_sats += rad_kalorier_sats
 
         table_rows.append({
-            "Recept": r["Recept"],
-            "Toppings": r["Topping"] if r["Topping"] != "Ingen" else "",
-            "Mängd": f"{r['Mängd_g']} g" if r["Topping"] != "Ingen" else "",
+            "Recept": r.get("Recept", ""),
+            "Toppings": topping_namn if topping_namn != "Ingen" else "",
+            "Mängd": f"{mängd_g} g" if topping_namn != "Ingen" else "",
             "Topping kr": f"{top_k:.2f} kr" if top_k > 0 else "",
             "Topping kcal": f"{top_kcal} kcal" if top_kcal > 0 else "",
             "Satser": rad_satser,
@@ -270,6 +347,7 @@ with tab4:
             "Kalorier/st": f"{rad_kalorier_st} kcal"
         })
 
+    # Totalsumma (Tot)
     tot_vinstpaslag = (tot_vinst / tot_kostnad * 100) if tot_kostnad > 0 else 0
     tot_snitt_bakad = tot_kostnad / tot_bakade if tot_bakade > 0 else 0
     tot_snitt_sald = tot_kostnad / tot_salda if tot_salda > 0 else 0
@@ -292,4 +370,18 @@ with tab4:
         "Kalorier/st": ""
     })
 
-    st.dataframe(pd.DataFrame(table_rows), hide_index=True, use_container_width=True)
+    df_display = pd.DataFrame(table_rows)
+
+    # FÄRGKODNINGSFUNKTION (MYSIG PEACH/VARMA TONER)
+    def fargkoda_rader(row):
+        if row["Recept"] == "Tot":
+            return ["background-color: #E8C3B9; font-weight: bold; color: #3C2A21;"] * len(row)
+        elif row.name % 2 == 0:
+            return ["background-color: #F8EFE6; color: #3C2A21;"] * len(row)
+        else:
+            return ["background-color: #FFFFFF; color: #3C2A21;"] * len(row)
+
+    styled_df = df_display.style.apply(fargkoda_rader, axis=1)
+
+    st.markdown("#### 📊 Sammanställning & Kalkyl")
+    st.dataframe(styled_df, hide_index=True, use_container_width=True)
