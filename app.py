@@ -9,6 +9,7 @@ st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", in
 # ==========================================
 st.markdown("""
     <style>
+        /* Bakgrund */
         .stApp {
             background-color: #FAF6F0;
             color: #3C2A21;
@@ -33,7 +34,7 @@ st.markdown("""
             background-color: #C86D51 !important;
         }
 
-        /* Flikar */
+        /* Flikar - Snygg styling */
         .stTabs [data-baseweb="tab-list"] {
             gap: 6px;
         }
@@ -49,11 +50,11 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Logga: Gör den mindre och ta bort vit bakgrund via blend-mode */
-        .logo-header img {
-            max-height: 55px;
+        /* Logga: Liten, vänsterställd och genomskinlig vit bakgrund */
+        .logo-container img {
+            max-height: 60px;
             object-fit: contain;
-            mix-blend-mode: multiply; /* Gör vit bakgrund genomskinlig mot beigt */
+            mix-blend-mode: multiply; /* Tar bort vit bakgrund */
         }
 
         /* Tabellstyling */
@@ -161,20 +162,19 @@ def berakna_recept_totalt(r_namn):
     return 50.0, 4000
 
 # ==========================================
-# LAYOUT MED LOGGA TILL VÄNSTER OM FLIKARNA
+# LOGOTYP LÄNGST UPP TILL VÄNSTER
 # ==========================================
-col_logo, col_tabs = st.columns([0.6, 9.4])
+st.markdown('<div class="logo-container">', unsafe_allow_html=True)
+if os.path.exists("Logga.jpg"):
+    st.image("Logga.jpg")
+elif os.path.exists("Logga.png"):
+    st.image("Logga.png")
+st.markdown('</div>', unsafe_allow_html=True)
 
-with col_logo:
-    st.markdown('<div class="logo-header">', unsafe_allow_html=True)
-    if os.path.exists("Logga.jpg"):
-        st.image("Logga.jpg")
-    elif os.path.exists("Logga.png"):
-        st.image("Logga.png")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col_tabs:
-    tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
+# ==========================================
+# HOVEDFLIKAR (ÅTERSTÄLLDA)
+# ==========================================
+tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
@@ -231,7 +231,7 @@ with tab4:
         nuvarande_order["rader"] = edited_df.to_dict(orient="records")
 
     # ------------------------------------------
-    # BERÄKNING
+    # BERÄKNING & FÄRGKODNING
     # ------------------------------------------
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser}
     table_rows = []
@@ -286,7 +286,7 @@ with tab4:
             "Mängd": f"{mängd_g} g" if topping_namn != "Ingen" else "",
             "Topping kr": f"{top_k:.2f} kr" if top_k > 0 else "",
             "Topping kcal": f"{top_kcal} kcal" if top_kcal > 0 else "",
-            "Satser": f"{rad_satser:.1f}", # Endast 1 decimal
+            "Satser": f"{rad_satser:.1f}",
             "Bakade": f"{rad_bakade} st",
             "Sålda": f"{rad_salda} st",
             "Kostnad": f"{round(rad_tot_kostnad)} kr",
@@ -325,25 +325,20 @@ with tab4:
 
     df_display = pd.DataFrame(table_rows)
 
-    # ------------------------------------------
-    # FÄRGKODNING AV KOLUMNER PÅ BILDENS SÄTT
-    # ------------------------------------------
     def fargkoda_kolumner(df):
         styles = pd.DataFrame('', index=df.index, columns=df.columns)
         
-        # Färgpaletter för kategorier (Mjuka pasteller)
         farger = {
             "grå": "background-color: #E2E8F0; color: #1E293B;",
-            "gul": "background-color: #FEF9C3; color: #713F12;",       # Toppings
-            "vit": "background-color: #FFFFFF; color: #0F172A;",       # Satser
-            "rosa": "background-color: #FCE7F3; color: #831843;",      # Bakade / Sålda
-            "grön": "background-color: #DCFCE7; color: #14532D;",      # Kostnader
-            "blå": "background-color: #DBEAFE; color: #1E3A8A;",       # Pris & Vinst
-            "beige": "background-color: #FEF3C7; color: #78350F;",     # Kalorier
-            "tot_rad": "background-color: #475569; color: #FFFFFF; font-weight: bold;" # Summering
+            "gul": "background-color: #FEF9C3; color: #713F12;",
+            "vit": "background-color: #FFFFFF; color: #0F172A;",
+            "rosa": "background-color: #FCE7F3; color: #831843;",
+            "grön": "background-color: #DCFCE7; color: #14532D;",
+            "blå": "background-color: #DBEAFE; color: #1E3A8A;",
+            "beige": "background-color: #FEF3C7; color: #78350F;",
+            "tot_rad": "background-color: #475569; color: #FFFFFF; font-weight: bold;"
         }
 
-        # Applicera kolumnfäger
         styles["Recept"] = farger["grå"]
         styles["Toppings"] = farger["gul"]
         styles["Mängd"] = farger["gul"]
@@ -362,7 +357,6 @@ with tab4:
         styles["Kalorier/sats"] = farger["beige"]
         styles["Kalorier/st"] = farger["beige"]
 
-        # Skriv över sista raden ("Tot") med en mörk markerad stil
         tot_idx = df[df["Recept"] == "Tot"].index
         for idx in tot_idx:
             styles.loc[idx] = farger["tot_rad"]
