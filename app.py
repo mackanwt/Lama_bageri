@@ -161,51 +161,36 @@ def berakna_recept_totalt(r_namn):
     return 50.0, 4000
 
 # ==========================================
-# HUVUDLAYOUT: LOGGA TILL VÄNSTER, FLIKAR TILL HÖGER
+# LOGGA HÖGST UPP TILL VÄNSTER
 # ==========================================
-header_col1, header_col2 = st.columns([1, 8], vertical_alignment="bottom")
-
-with header_col1:
-    logo_path = "Logga.jpg" if os.path.exists("Logga.jpg") else ("Logga.png" if os.path.exists("Logga.png") else None)
-    if logo_path:
-        st.image(logo_path, width=65)
-
-with header_col2:
-    tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
+logo_path = "Logga.jpg" if os.path.exists("Logga.jpg") else ("Logga.png" if os.path.exists("Logga.png") else None)
+if logo_path:
+    st.image(logo_path, width=80)
 
 # ==========================================
-# INNEHÅLL I FLIKARNA
+# FLIKAR UNDER LOGGAN
 # ==========================================
+tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
-# Flik 1: Ingredienser (Anpassade/små kolumner)
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
-    col_t1, _ = st.columns([1, 2])
-    with col_t1:
-        st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=False)
+    st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=True)
 
-# Flik 2: Toppings (Anpassade/små kolumner)
 with tab2:
     st.subheader("🍓 Hantera Toppings")
-    col_t2, _ = st.columns([1, 2])
-    with col_t2:
-        alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
-        ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
-        if st.button("➕ Lägg till i Toppings"):
-            if ny_topping not in st.session_state.toppings_lista:
-                st.session_state.toppings_lista.append(ny_topping)
-                st.rerun()
-        st.dataframe(pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]), hide_index=True, use_container_width=False)
+    alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
+    ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
+    if st.button("➕ Lägg till i Toppings"):
+        if ny_topping not in st.session_state.toppings_lista:
+            st.session_state.toppings_lista.append(ny_topping)
+            st.rerun()
+    st.dataframe(pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]), hide_index=True, use_container_width=True)
 
-# Flik 3: Recept (Anpassade/små kolumner)
 with tab3:
     st.subheader("📖 Receptöversikt")
-    col_t3, _ = st.columns([1, 2])
-    with col_t3:
-        recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
-        st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=False)
+    recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
+    st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=True)
 
-# Flik 4: Orderbyggare (98% fullskärmsbredd)
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
