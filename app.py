@@ -50,11 +50,10 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Logga: Liten, vänsterställd och genomskinlig vit bakgrund */
-        .logo-container img {
-            max-height: 60px;
+        /* Bild-styling för loggan */
+        div[data-testid="stImage"] img {
+            mix-blend-mode: multiply;
             object-fit: contain;
-            mix-blend-mode: multiply; /* Tar bort vit bakgrund */
         }
 
         /* Tabellstyling */
@@ -162,39 +161,52 @@ def berakna_recept_totalt(r_namn):
     return 50.0, 4000
 
 # ==========================================
-# LOGOTYP LÄNGST UPP TILL VÄNSTER
+# LAYOUT: LOGGA + FLIKAR SIDA VID SIDA
 # ==========================================
-st.markdown('<div class="logo-container">', unsafe_allow_html=True)
-if os.path.exists("Logga.jpg"):
-    st.image("Logga.jpg")
-elif os.path.exists("Logga.png"):
-    st.image("Logga.png")
-st.markdown('</div>', unsafe_allow_html=True)
+col_logo, col_tabs = st.columns([0.8, 11], vertical_alignment="bottom")
+
+with col_logo:
+    if os.path.exists("Logga.jpg"):
+        st.image("Logga.jpg", width=70)
+    elif os.path.exists("Logga.png"):
+        st.image("Logga.png", width=70)
+
+with col_tabs:
+    tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
 # ==========================================
-# HOVEDFLIKAR (ÅTERSTÄLLDA)
+# INNEHÅLL I FLIKARNA
 # ==========================================
-tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
+# Flik 1: Ingredienser (Kompakt layout)
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
-    st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=True)
+    col_t1, _ = st.columns([2, 1])
+    with col_t1:
+        st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=False)
 
+# Flik 2: Toppings (Kompakt layout)
 with tab2:
     st.subheader("🍓 Hantera Toppings")
-    alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
-    ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
-    if st.button("➕ Lägg till i Toppings"):
-        if ny_topping not in st.session_state.toppings_lista:
-            st.session_state.toppings_lista.append(ny_topping)
-            st.rerun()
-    st.dataframe(pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]), hide_index=True, use_container_width=True)
+    col_t2, _ = st.columns([2, 1])
+    with col_t2:
+        alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
+        ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
+        if st.button("➕ Lägg till i Toppings"):
+            if ny_topping not in st.session_state.toppings_lista:
+                st.session_state.toppings_lista.append(ny_topping)
+                st.rerun()
+        st.dataframe(pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]), hide_index=True, use_container_width=False)
 
+# Flik 3: Recept (Kompakt layout)
 with tab3:
     st.subheader("📖 Receptöversikt")
-    recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
-    st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=True)
+    col_t3, _ = st.columns([2, 1])
+    with col_t3:
+        recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
+        st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=False)
 
+# Flik 4: Orderbyggare (Bred 98%-layout)
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
@@ -206,9 +218,7 @@ with tab4:
     st.markdown(f"### {valj_order}")
     st.caption(f"Datum: {nuvarande_order['datum']}")
 
-    # ------------------------------------------
-    # REDIGERING DIREKT I CELLER
-    # ------------------------------------------
+    # Redigering i tabellen
     with st.expander("✏️ Redigera orderrader direkt i tabellen", expanded=True):
         df_edit = pd.DataFrame(nuvarande_order["rader"])
         
@@ -230,9 +240,7 @@ with tab4:
         
         nuvarande_order["rader"] = edited_df.to_dict(orient="records")
 
-    # ------------------------------------------
-    # BERÄKNING & FÄRGKODNING
-    # ------------------------------------------
+    # Beräkning och Färgkodad kalkyl
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser}
     table_rows = []
     
@@ -300,7 +308,7 @@ with tab4:
             "Kalorier/st": f"{rad_kalorier_st} kcal"
         })
 
-    # Totalsumma (Tot)
+    # Totalsumma
     tot_vinstpaslag = (tot_vinst / tot_kostnad * 100) if tot_kostnad > 0 else 0
     tot_snitt_bakad = tot_kostnad / tot_bakade if tot_bakade > 0 else 0
     tot_snitt_sald = tot_kostnad / tot_salda if tot_salda > 0 else 0
