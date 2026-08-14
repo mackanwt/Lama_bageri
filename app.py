@@ -4,81 +4,78 @@ import pandas as pd
 st.set_page_config(page_title="Bagerikalkylatorn", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
 # ==========================================
-# KOMPAKT CSS & TEKNAD LAMA-LOGOTYP (SVG)
+# TEKNAD LAMA-LOGOTYP (SVG med Outlines) & CSS
 # ==========================================
-LLAMA_LOGO_SVG = """
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="55" height="55" style="vertical-align: middle; margin-right: 12px;">
-  <!-- Kavel bakom/under hakan -->
-  <rect x="15" y="74" width="70" height="8" rx="3" fill="#d2b48c" stroke="#8b5a2b" stroke-width="2"/>
-  <rect x="5" y="75" width="10" height="6" rx="2" fill="#8b5a2b"/>
-  <rect x="85" y="75" width="10" height="6" rx="2" fill="#8b5a2b"/>
-  
+LLAMA_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="60" height="60" style="vertical-align: middle;">
+  <!-- Kavel -->
+  <g stroke="#2c2c2c" stroke-width="2.5" fill="#e8c29b" stroke-linejoin="round">
+    <rect x="20" y="92" width="80" height="10" rx="4"/>
+    <rect x="10" y="94" width="10" height="6" rx="2" fill="#b88b5c"/>
+    <rect x="100" y="94" width="10" height="6" rx="2" fill="#b88b5c"/>
+  </g>
   <!-- Öron -->
-  <ellipse cx="30" cy="38" rx="6" ry="16" fill="#fdfbf7" stroke="#d0c0b0" stroke-width="2" transform="rotate(-15 30 38)"/>
-  <ellipse cx="70" cy="38" rx="6" ry="16" fill="#fdfbf7" stroke="#d0c0b0" stroke-width="2" transform="rotate(15 70 38)"/>
-  <ellipse cx="30" cy="38" rx="3" ry="10" fill="#f0e6df" transform="rotate(-15 30 38)"/>
-  <ellipse cx="70" cy="38" rx="3" ry="10" fill="#f0e6df" transform="rotate(15 70 38)"/>
-  
-  <!-- Huvud -->
-  <path d="M 33,45 C 33,32 67,32 67,45 C 67,65 62,76 50,76 C 38,76 33,65 33,45 Z" fill="#fdfbf7" stroke="#d0c0b0" stroke-width="2"/>
-  
-  <!-- Mulle / Nos -->
-  <ellipse cx="50" cy="62" rx="10" ry="8" fill="#f0e6df" stroke="#d0c0b0" stroke-width="1"/>
-  <path d="M 46,59 L 54,59 L 50,63 Z" fill="#8b5a2b"/>
-  <path d="M 50,63 L 50,67" stroke="#8b5a2b" stroke-width="1.5"/>
-  
+  <g stroke="#2c2c2c" stroke-width="2.5" fill="#fcf8f2">
+    <ellipse cx="38" cy="38" rx="7" ry="18" transform="rotate(-20 38 38)"/>
+    <ellipse cx="82" cy="38" rx="7" ry="18" transform="rotate(20 82 38)"/>
+  </g>
+  <ellipse cx="38" cy="38" rx="3.5" ry="11" fill="#f2c4ce" transform="rotate(-20 38 38)"/>
+  <ellipse cx="82" cy="38" rx="3.5" ry="11" fill="#f2c4ce" transform="rotate(20 82 38)"/>
+  <!-- Huvud & Hals -->
+  <path d="M 42,48 C 30,48 35,88 42,88 L 78,88 C 85,88 90,48 78,48 Z" fill="#fcf8f2" stroke="#2c2c2c" stroke-width="2.5"/>
+  <!-- Lockigt Fluff-hår -->
+  <path d="M 40,42 C 38,36 44,32 48,35 C 52,30 60,30 63,35 C 68,32 75,36 73,42 C 77,46 72,52 68,50 C 65,54 55,54 52,50 C 48,52 43,46 40,42 Z" fill="#fcf8f2" stroke="#2c2c2c" stroke-width="2.5"/>
+  <!-- Mulle/Nos -->
+  <ellipse cx="60" cy="68" rx="11" ry="8" fill="#f5e5d3" stroke="#2c2c2c" stroke-width="2"/>
+  <path d="M 55,65 C 57,63 63,63 65,65 C 65,68 60,71 60,71 C 60,71 55,68 55,65 Z" fill="#f2c4ce" stroke="#2c2c2c" stroke-width="1.5"/>
+  <path d="M 60,71 L 60,74 M 57,74 Q 60,76 63,74" stroke="#2c2c2c" stroke-width="1.5" fill="none"/>
   <!-- Ögon -->
-  <circle cx="42" cy="50" r="3.5" fill="#2c2c2c"/>
-  <circle cx="58" cy="50" r="3.5" fill="#2c2c2c"/>
-  <circle cx="43.5" cy="48.5" r="1.2" fill="#ffffff"/>
-  <circle cx="59.5" cy="48.5" r="1.2" fill="#ffffff"/>
-  
+  <ellipse cx="48" cy="58" rx="4.5" ry="5.5" fill="#2c2c2c"/>
+  <ellipse cx="72" cy="58" rx="4.5" ry="5.5" fill="#2c2c2c"/>
+  <circle cx="46.5" cy="56" r="1.8" fill="#ffffff"/>
+  <circle cx="70.5" cy="56" r="1.8" fill="#ffffff"/>
   <!-- Kinder -->
-  <ellipse cx="37" cy="56" rx="3.5" ry="2" fill="#ffb6c1" opacity="0.6"/>
-  <ellipse cx="63" cy="56" rx="3.5" ry="2" fill="#ffb6c1" opacity="0.6"/>
-  
+  <ellipse cx="42" cy="66" rx="4" ry="2.5" fill="#f2a7b3" opacity="0.7"/>
+  <ellipse cx="78" cy="66" rx="4" ry="2.5" fill="#f2a7b3" opacity="0.7"/>
   <!-- Kockhatt -->
-  <path d="M 36,32 C 28,18 40,8 50,10 C 60,8 72,18 64,32 Z" fill="#ffffff" stroke="#cccccc" stroke-width="2"/>
-  <rect x="35" y="30" width="30" height="8" rx="2" fill="#ffffff" stroke="#cccccc" stroke-width="1.5"/>
-</svg>
-"""
+  <g stroke="#2c2c2c" stroke-width="2.5" fill="#ffffff">
+    <path d="M 44,28 C 36,12 52,4 60,8 C 68,4 84,12 76,28 Z"/>
+    <rect x="43" y="26" width="34" height="8" rx="2" fill="#ffffff"/>
+  </g>
+</svg>"""
 
-st.markdown(f"""
-    <head>
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="BageriApp">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    </head>
+st.markdown("""
     <style>
-        /* Krymp vaddering och höjd på rader i alla tabeller */
-        div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {{
-            padding: 2px 10px !important;
+        div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
+            padding: 3px 10px !important;
             font-size: 14px !important;
-        }}
-        .block-container {{
-            padding-top: 1.5rem !important;
-            padding-bottom: 1.5rem !important;
-            max-width: 1000px !important;
-        }}
-        .main-header {{
+        }
+        .block-container {
+            padding-top: 1.2rem !important;
+            padding-bottom: 1.2rem !important;
+            max-width: 900px !important;
+        }
+        .header-box {
             display: flex;
             align-items: center;
+            gap: 12px;
             margin-bottom: 10px;
-        }}
+        }
+        .header-box h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# Rubrik med den tecknade lamalogo
-st.markdown(f"""
-    <div class="main-header">
-        {LLAMA_LOGO_SVG}
-        <h1 style="display: inline; margin: 0; vertical-align: middle;">Bagerikalkylatorn</h1>
-    </div>
-""", unsafe_allow_html=True)
+# Sidhuvud utan HTML-fel
+col_logo, col_title = st.columns([1, 8])
+with col_logo:
+    st.markdown(LLAMA_SVG, unsafe_allow_html=True)
+with col_title:
+    st.title("Bagerikalkylatorn")
 
 # ==========================================
-# 1. DATA-INITIALISERING
+# 1. INITIALISERING AV INGREDIENSER OCH RECEPT
 # ==========================================
 DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 50},
@@ -118,21 +115,42 @@ DEFAULT_INGREDIENSER = [
 ]
 
 DEFAULT_RECEPT = {
-    "Muffins": {"sats_antal": 22, "bas_kostnad": 51.05, "kcal_sats": 4650},
-    "Biskvier": {"sats_antal": 18, "bas_kostnad": 96.19, "kcal_sats": 3350},
-    "Oat cookie": {"sats_antal": 20, "bas_kostnad": 65.87, "kcal_sats": 4100},
-    "Kanelbullar": {"sats_antal": 40, "bas_kostnad": 69.26, "kcal_sats": 5450},
-    "Cookie": {"sats_antal": 21, "bas_kostnad": 40.22, "kcal_sats": 3200},
-    "Brownie": {"sats_antal": 9, "bas_kostnad": 78.32, "kcal_sats": 3850},
-    "Bagels": {"sats_antal": 12, "bas_kostnad": 21.06, "kcal_sats": 2850},
-    "Morotskaka": {"sats_antal": 20, "bas_kostnad": 69.86, "kcal_sats": 4400},
-    "Chokladkaka": {"sats_antal": 24, "bas_kostnad": 143.69, "kcal_sats": 9800},
-    "Orange cake": {"sats_antal": 1, "bas_kostnad": 48.23, "kcal_sats": 820},
-    "Cinnamon loaf": {"sats_antal": 2, "bas_kostnad": 45.27, "kcal_sats": 820}
+    "Muffins": {
+        "sats_antal": 22,
+        "ingredienser": [
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 0.5},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.3},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.2},
+            {"Ingrediens": "Egg (st)", "Mängd": 3}
+        ]
+    },
+    "Biskvier": {
+        "sats_antal": 18,
+        "ingredienser": [
+            {"Ingrediens": "Mandel (kg)", "Mängd": 0.25},
+            {"Ingrediens": "Florsocker (kg)", "Mängd": 0.3},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.2},
+            {"Ingrediens": "Bakchoklad mörk (kg)", "Mängd": 0.15}
+        ]
+    },
+    "Kanelbullar": {
+        "sats_antal": 40,
+        "ingredienser": [
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 1.0},
+            {"Ingrediens": "Mjölk (kg)", "Mängd": 0.5},
+            {"Ingrediens": "Smör (kg)", "Mängd": 0.2},
+            {"Ingrediens": "Socker (kg)", "Mängd": 0.15},
+            {"Ingrediens": "Jäst (kg)", "Mängd": 0.05},
+            {"Ingrediens": "Kanel (kg)", "Mängd": 0.02}
+        ]
+    }
 }
 
 if "ingredienser" not in st.session_state:
     st.session_state.ingredienser = DEFAULT_INGREDIENSER
+
+if "recept" not in st.session_state:
+    st.session_state.recept = DEFAULT_RECEPT
 
 if "order_rader" not in st.session_state:
     st.session_state.order_rader = []
@@ -140,15 +158,22 @@ if "order_rader" not in st.session_state:
 if "edit_mode_ing" not in st.session_state:
     st.session_state.edit_mode_ing = False
 
-tab1, tab2, tab3 = st.tabs(["🥦 Ingredienser", "📖 Recept", "🛒 Orderbyggare"])
+def berakna_recept_totalt(recept_data, ingrediens_lista):
+    """Beräknar total kostnad och totala kalorier dynamiskt utifrån valda ingredienser."""
+    ing_map = {item["Ingrediens"]: item for item in ingrediens_lista if "Ingrediens" in item}
+    tot_kostnad = 0.0
+    tot_kcal = 0.0
+    for r_ing in recept_data.get("ingredienser", []):
+        namn = r_ing.get("Ingrediens")
+        mangd = float(r_ing.get("Mängd", 0.0))
+        if namn in ing_map:
+            pris = float(ing_map[namn].get("Pris", 0.0))
+            kcal = float(ing_map[namn].get("Kalorier", 0.0))
+            tot_kostnad += pris * mangd
+            tot_kcal += kcal * mangd
+    return round(tot_kostnad, 2), int(tot_kcal)
 
-# Kolumnkonfiguration för kompakt visning i Ingrediens-fliken
-ing_col_config = {
-    "Ingrediens": st.column_config.TextColumn("Ingrediens", width="medium"),
-    "Pris": st.column_config.NumberColumn("Pris (kr)", format="%.2f kr", width="small"),
-    "Enhet": st.column_config.TextColumn("Enhet", width="small"),
-    "Kalorier": st.column_config.NumberColumn("Kalorier", format="%d kcal", width="small"),
-}
+tab1, tab2, tab3 = st.tabs(["🥦 Ingredienser", "📖 Recept", "🛒 Orderbyggare"])
 
 # ==========================================
 # FLIK 1: INGREDIENSBIBLIOTEK
@@ -159,7 +184,7 @@ with tab1:
         st.subheader("🥦 Ingrediensbibliotek")
     with col_btn:
         if st.session_state.edit_mode_ing:
-            if st.button("💾 Spara & Lås tabell", type="primary", use_container_width=True):
+            if st.button("💾 Spara & Lås", type="primary", use_container_width=True):
                 st.session_state.edit_mode_ing = False
                 st.rerun()
         else:
@@ -168,9 +193,9 @@ with tab1:
                 st.rerun()
 
     with st.expander("➕ Lägg till ny ingrediens"):
-        i_namn = st.text_input("Ingrediensnamn (t.ex. Pecannötter (kg))")
+        i_namn = st.text_input("Ingrediensnamn")
         col_p1, col_p2, col_p3 = st.columns(3)
-        i_pris = col_p1.number_input("Pris (SEK)", min_value=0.0, step=1.0)
+        i_pris = col_p1.number_input("Pris (kr)", min_value=0.0, step=1.0)
         i_enhet = col_p2.selectbox("Enhet", ["kg", "st", "liter", "g"])
         i_kcal = col_p3.number_input("Kalorier per enhet", min_value=0, step=10)
         
@@ -186,12 +211,17 @@ with tab1:
                 st.rerun()
 
     df_ing = pd.DataFrame(st.session_state.ingredienser)
+    ing_config = {
+        "Ingrediens": st.column_config.TextColumn("Ingrediens", width="medium"),
+        "Pris": st.column_config.NumberColumn("Pris (kr)", format="%.2f kr", width="small"),
+        "Enhet": st.column_config.TextColumn("Enhet", width="small"),
+        "Kalorier": st.column_config.NumberColumn("Kalorier", format="%d kcal", width="small"),
+    }
 
     if st.session_state.edit_mode_ing:
-        st.info("💡 **Redigeringsläge:** Ändra värden direkt i cellerna nedan.")
         edited_df = st.data_editor(
             df_ing,
-            column_config=ing_col_config,
+            column_config=ing_config,
             use_container_width=False,
             hide_index=True,
             num_rows="dynamic",
@@ -199,35 +229,115 @@ with tab1:
         )
         st.session_state.ingredienser = edited_df.to_dict(orient="records")
     else:
-        st.dataframe(
-            df_ing,
-            column_config=ing_col_config,
-            use_container_width=False,
-            hide_index=True
-        )
+        st.dataframe(df_ing, column_config=ing_config, use_container_width=False, hide_index=True)
 
 # ==========================================
-# FLIK 2: RECEPTÖVERSIKT
+# FLIK 2: RECEPT (ÖVERSIKT, LÄGG TILL, REDIGERA)
 # ==========================================
 with tab2:
-    st.subheader("📖 Basrecept & Kalkyler")
-    recept_data = []
-    for k, v in DEFAULT_RECEPT.items():
-        recept_data.append({
-            "Recept": k,
-            "Antal/sats": f"{v['sats_antal']} st",
-            "Bas Kostnad/sats": f"{v['bas_kostnad']:.2f} kr",
-            "Kostnad/st": f"{(v['bas_kostnad'] / v['sats_antal']):.2f} kr",
-            "Kalorier/st": f"{int(v['kcal_sats'] / v['sats_antal'])} kcal"
+    st.subheader("📖 Receptöversikt")
+    
+    # 3 rena kolumner
+    recept_rader = []
+    for r_namn, r_data in st.session_state.recept.items():
+        kostnad, kcal = berakna_recept_totalt(r_data, st.session_state.ingredienser)
+        recept_rader.append({
+            "Recept": r_namn,
+            "Kostnad per recept": f"{kostnad:.2f} kr",
+            "Totala kalorier": f"{kcal} kcal"
         })
+    
+    df_recept_view = pd.DataFrame(recept_rader)
     st.dataframe(
-        pd.DataFrame(recept_data),
+        df_recept_view,
+        column_config={
+            "Recept": st.column_config.TextColumn("Recept", width="medium"),
+            "Kostnad per recept": st.column_config.TextColumn("Kostnad per recept", width="medium"),
+            "Totala kalorier": st.column_config.TextColumn("Totala kalorier", width="medium")
+        },
         use_container_width=False,
         hide_index=True
     )
 
+    st.markdown("---")
+    col_act1, col_act2 = st.columns(2)
+
+    # LÄGG TILL RECEPT
+    with col_act1:
+        with st.expander("➕ Lägg till recept", expanded=False):
+            nytt_namn = st.text_input("Receptnamn", key="nytt_rec_namn")
+            sats_antal = st.number_input("Antal bakverk per sats (st)", min_value=1, value=12, key="nytt_rec_sats")
+            
+            all_ing_names = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
+            
+            st.markdown("**Välj ingredienser:**")
+            if "temp_ing" not in st.session_state:
+                st.session_state.temp_ing = []
+
+            c1, c2, c3 = st.columns([3, 2, 1])
+            sel_ing = c1.selectbox("Ingrediens", all_ing_names, key="add_rec_ing_sel")
+            sel_mangd = c2.number_input("Mängd (st / kg)", min_value=0.001, value=0.100, step=0.050, key="add_rec_mangd")
+            
+            if c3.button("➕ Rad"):
+                st.session_state.temp_ing.append({"Ingrediens": sel_ing, "Mängd": sel_mangd})
+
+            if st.session_state.temp_ing:
+                st.dataframe(pd.DataFrame(st.session_state.temp_ing), hide_index=True, use_container_width=True)
+                calc_k, calc_kcal = berakna_recept_totalt({"ingredienser": st.session_state.temp_ing}, st.session_state.ingredienser)
+                st.caption(f"Beräknat: **{calc_k:.2f} kr** | **{calc_kcal} kcal**")
+
+            if st.button("💾 Spara Recept", type="primary"):
+                if nytt_namn and st.session_state.temp_ing:
+                    st.session_state.recept[nytt_namn] = {
+                        "sats_antal": sats_antal,
+                        "ingredienser": st.session_state.temp_ing
+                    }
+                    st.session_state.temp_ing = []
+                    st.success(f"Receptet '{nytt_namn}' har sparats!")
+                    st.rerun()
+
+    # REDIGERA RECEPT
+    with col_act2:
+        with st.expander("✏️ Redigera recept", expanded=False):
+            recept_lista = list(st.session_state.recept.keys())
+            if recept_lista:
+                edit_target = st.selectbox("Välj recept att redigera", recept_lista)
+                rec_obj = st.session_state.recept[edit_target]
+                
+                edit_sats = st.number_input("Antal/sats (st)", min_value=1, value=rec_obj.get("sats_antal", 12), key="edit_sats_num")
+                
+                current_ings = pd.DataFrame(rec_obj.get("ingredienser", []))
+                if current_ings.empty:
+                    current_ings = pd.DataFrame([{"Ingrediens": all_ing_names[0], "Mängd": 0.1}])
+
+                st.markdown("**Ändra ingredienser i tabellen:**")
+                edited_ing_df = st.data_editor(
+                    current_ings,
+                    column_config={
+                        "Ingrediens": st.column_config.SelectboxColumn("Ingrediens", options=all_ing_names, required=True),
+                        "Mängd": st.column_config.NumberColumn("Mängd", min_value=0.001, format="%.3f")
+                    },
+                    num_rows="dynamic",
+                    use_container_width=True,
+                    key=f"editor_{edit_target}"
+                )
+
+                col_s1, col_s2 = st.columns(2)
+                if col_s1.button("💾 Spara Ändringar", type="primary"):
+                    updated_ings = edited_ing_df.dropna().to_dict(orient="records")
+                    st.session_state.recept[edit_target] = {
+                        "sats_antal": edit_sats,
+                        "ingredienser": updated_ings
+                    }
+                    st.success(f"Uppdaterade '{edit_target}'!")
+                    st.rerun()
+                
+                if col_s2.button("🗑️ Ta bort recept"):
+                    del st.session_state.recept[edit_target]
+                    st.rerun()
+
 # ==========================================
-# FLIK 3: ORDERBYGGARE (Order 11-morfar stil)
+# FLIK 3: ORDERBYGGARE
 # ==========================================
 with tab3:
     st.subheader("🛒 Bygg Order (ex. Order 11-morfar)")
@@ -239,7 +349,7 @@ with tab3:
     
     col_a, col_b = st.columns(2)
     with col_a:
-        valgt_recept = st.selectbox("Välj Recept", list(DEFAULT_RECEPT.keys()))
+        valgt_recept = st.selectbox("Välj Recept", list(st.session_state.recept.keys()))
         
         ing_namn_lista = ["Ingen"] + [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
         valgd_topping = st.selectbox("Topping / Extra Ingrediens", ing_namn_lista)
@@ -256,6 +366,10 @@ with tab3:
         salda_st = st.number_input("Sålda (st)", min_value=1, value=18)
         pris_per_st = st.number_input("Pris / cookie (kr)", min_value=0.0, value=15.0, step=1.0)
 
+    # Räkna ut grundkostnad för receptet
+    rec_info = st.session_state.recept[valgt_recept]
+    bas_k, bas_kcal = berakna_recept_totalt(rec_info, st.session_state.ingredienser)
+
     topping_kostnad = 0.0
     topping_kcal = 0
     if valgd_topping != "Ingen":
@@ -266,8 +380,6 @@ with tab3:
             topping_kcal = float(ing_info.get("Kalorier", 0)) * faktor
 
     if st.button("➕ Lägg till rad i ordern", type="primary"):
-        bas_k = DEFAULT_RECEPT[valgt_recept]["bas_kostnad"]
-        bas_kcal = DEFAULT_RECEPT[valgt_recept]["kcal_sats"]
         tot_rad_kostnad = bas_k + topping_kostnad
         tot_rad_pris = salda_st * pris_per_st
         vinst = tot_rad_pris - tot_rad_kostnad
