@@ -37,6 +37,7 @@ st.markdown("""
         /* Styling för Flikar */
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px;
+            margin-top: 10px;
         }
         .stTabs [data-baseweb="tab"] {
             border-radius: 8px 8px 0 0;
@@ -50,10 +51,15 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Bild-mixmode för transparent logga */
-        div[data-testid="stImage"] img {
-            mix-blend-mode: multiply;
+        /* Logga styling för att förhindra kapning */
+        .logo-container {
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .logo-container img {
+            max-height: 70px;
             object-fit: contain;
+            mix-blend-mode: multiply;
         }
 
         /* Tabellstyling */
@@ -161,36 +167,71 @@ def berakna_recept_totalt(r_namn):
     return 50.0, 4000
 
 # ==========================================
-# LOGGA HÖGST UPP TILL VÄNSTER
+# LOGGA HÖGST UPP TILL VÄNSTER (EJ KAPAD)
 # ==========================================
 logo_path = "Logga.jpg" if os.path.exists("Logga.jpg") else ("Logga.png" if os.path.exists("Logga.png") else None)
 if logo_path:
-    st.image(logo_path, width=80)
+    import base64
+    with open(logo_path, "rb") as f:
+        img_bytes = f.read()
+    encoded = base64.b64encode(img_bytes).decode()
+    st.markdown(f'<div class="logo-container"><img src="data:image/png;base64,{encoded}"></div>', unsafe_allow_html=True)
 
 # ==========================================
 # FLIKAR UNDER LOGGAN
 # ==========================================
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
+# Flik 1: Ingredienser (Smala kolumner)
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
-    st.dataframe(pd.DataFrame(st.session_state.ingredienser), hide_index=True, use_container_width=True)
+    col1, _ = st.columns([5, 5])
+    with col1:
+        st.dataframe(
+            pd.DataFrame(st.session_state.ingredienser),
+            hide_index=True,
+            column_config={
+                "Ingrediens": st.column_config.TextColumn("Ingrediens", width="medium"),
+                "Pris": st.column_config.NumberColumn("Pris", width="small", format="%.2f kr"),
+                "Enhet": st.column_config.TextColumn("Enhet", width="small"),
+                "Kalorier": st.column_config.NumberColumn("Kalorier", width="small")
+            }
+        )
 
+# Flik 2: Toppings (Smala kolumner)
 with tab2:
     st.subheader("🍓 Hantera Toppings")
-    alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
-    ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
-    if st.button("➕ Lägg till i Toppings"):
-        if ny_topping not in st.session_state.toppings_lista:
-            st.session_state.toppings_lista.append(ny_topping)
-            st.rerun()
-    st.dataframe(pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]), hide_index=True, use_container_width=True)
+    col2, _ = st.columns([4, 6])
+    with col2:
+        alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
+        ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
+        if st.button("➕ Lägg till i Toppings"):
+            if ny_topping not in st.session_state.toppings_lista:
+                st.session_state.toppings_lista.append(ny_topping)
+                st.rerun()
+        st.dataframe(
+            pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]),
+            hide_index=True,
+            column_config={"Topping": st.column_config.TextColumn("Topping", width="medium")}
+        )
 
+# Flik 3: Recept (Smala kolumner)
 with tab3:
     st.subheader("📖 Receptöversikt")
-    recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
-    st.dataframe(pd.DataFrame(recept_rader), hide_index=True, use_container_width=True)
+    col3, _ = st.columns([4, 6])
+    with col3:
+        recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
+        st.dataframe(
+            pd.DataFrame(recept_rader),
+            hide_index=True,
+            column_config={
+                "Recept": st.column_config.TextColumn("Recept", width="medium"),
+                "Kostnad": st.column_config.TextColumn("Kostnad", width="small"),
+                "Kalorier": st.column_config.TextColumn("Kalorier", width="small")
+            }
+        )
 
+# Flik 4: Orderbyggare (Full bredd)
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
