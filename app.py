@@ -110,17 +110,17 @@ DEFAULT_INGREDIENSER = [
 DEFAULT_TOPPINGS = ["Blåbär (kg)", "Chokladknappar (kg)", "Kokosflingor (kg)", "Valnötter (kg)", "Sesamfrön (kg)", "Vallmofrön (kg)"]
 
 DEFAULT_RECEPT = {
-    "Muffins": {"override_kostnad": 51.05, "override_kcal": 4650},
-    "Biskvier": {"override_kostnad": 96.19, "override_kcal": 3350},
-    "Oat cookie": {"override_kostnad": 65.87, "override_kcal": 4100},
-    "Brownie": {"override_kostnad": 78.32, "override_kcal": 3850},
-    "Cookie": {"override_kostnad": 40.22, "override_kcal": 3200},
-    "Bagels": {"override_kostnad": 21.06, "override_kcal": 2850},
-    "Morotskaka": {"override_kostnad": 69.86, "override_kcal": 4400},
-    "Chokladkaka": {"override_kostnad": 143.69, "override_kcal": 9800},
-    "Kanelbullar": {"override_kostnad": 69.26, "override_kcal": 5450},
-    "Orange cake": {"override_kostnad": 48.23, "override_kcal": 820},
-    "Cinnamon loaf": {"override_kostnad": 45.27, "override_kcal": 820}
+    "Muffins": {"override_kostnad": 51.05, "override_kcal": 4650, "ingredienser": [{"Ingrediens": "Mjöl (kg)", "Mängd": 300}, {"Ingrediens": "Socker (kg)", "Mängd": 200}, {"Ingrediens": "Egg (st)", "Mängd": 2}]},
+    "Biskvier": {"override_kostnad": 96.19, "override_kcal": 3350, "ingredienser": []},
+    "Oat cookie": {"override_kostnad": 65.87, "override_kcal": 4100, "ingredienser": []},
+    "Brownie": {"override_kostnad": 78.32, "override_kcal": 3850, "ingredienser": []},
+    "Cookie": {"override_kostnad": 40.22, "override_kcal": 3200, "ingredienser": []},
+    "Bagels": {"override_kostnad": 21.06, "override_kcal": 2850, "ingredienser": []},
+    "Morotskaka": {"override_kostnad": 69.86, "override_kcal": 4400, "ingredienser": []},
+    "Chokladkaka": {"override_kostnad": 143.69, "override_kcal": 9800, "ingredienser": []},
+    "Kanelbullar": {"override_kostnad": 69.26, "override_kcal": 5450, "ingredienser": []},
+    "Orange cake": {"override_kostnad": 48.23, "override_kcal": 820, "ingredienser": []},
+    "Cinnamon loaf": {"override_kostnad": 45.27, "override_kcal": 820, "ingredienser": []}
 }
 
 DEFAULT_ORDERS = {
@@ -154,11 +154,29 @@ if "recept" not in st.session_state:
 if "orders_db" not in st.session_state:
     st.session_state.orders_db = DEFAULT_ORDERS
 
+if "aktiv_recept_vy" not in st.session_state:
+    st.session_state.aktiv_recept_vy = None  # Kan vara None eller ett receptnamn ("NYTT" för nytt recept)
+
 def berakna_recept_totalt(r_namn):
     r_data = st.session_state.recept.get(r_namn, {})
-    if "override_kostnad" in r_data and "override_kcal" in r_data:
-        return r_data["override_kostnad"], r_data["override_kcal"]
-    return 50.0, 4000
+    ing_lista = r_data.get("ingredienser", [])
+    
+    if ing_lista:
+        tot_k = 0.0
+        tot_kcal = 0
+        ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
+        for item in ing_lista:
+            ing_namn = item.get("Ingrediens")
+            mängd = float(item.get("Mängd", 0))
+            if ing_namn in ing_map:
+                info = ing_map[ing_namn]
+                enhet = info.get("Enhet", "kg")
+                faktor = (mängd / 1000.0) if enhet in ["kg", "l"] else mängd
+                tot_k += info.get("Pris", 0.0) * faktor
+                tot_kcal += int(info.get("Kalorier", 0) * faktor)
+        return tot_k, tot_kcal
+    else:
+        return r_data.get("override_kostnad", 50.0), r_data.get("override_kcal", 4000)
 
 # ==========================================
 # LOGGA HÖGST UPP (SÄKER INLÄSNING)
@@ -177,14 +195,13 @@ except Exception:
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
 # ------------------------------------------
-# Flik 1: Ingredienser (Redigeringsbar + Radera)
+# Flik 1: Ingredienser
 # ------------------------------------------
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
     col1, _ = st.columns([6, 4])
     with col1:
         df_ing = pd.DataFrame(st.session_state.ingredienser)
-        
         edited_ing_df = st.data_editor(
             df_ing,
             num_rows="dynamic",
@@ -198,12 +215,10 @@ with tab1:
             },
             key="ingrediens_editor"
         )
-        
-        # Spara ändringar i session state
         st.session_state.ingredienser = edited_ing_df.to_dict(orient="records")
 
 # ------------------------------------------
-# Flik 2: Toppings (Med raderingsknapp per rad)
+# Flik 2: Toppings
 # ------------------------------------------
 with tab2:
     st.subheader("🍓 Hantera Toppings")
@@ -211,7 +226,6 @@ with tab2:
     with col2:
         alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i and i["Ingrediens"]]
         
-        # Lägg till ny topping
         st.markdown("##### Lägg till ny topping")
         c_sel, c_btn = st.columns([3, 2])
         with c_sel:
@@ -224,8 +238,6 @@ with tab2:
 
         st.markdown("---")
         st.markdown("##### Befintliga Toppings")
-        
-        # Lista med delete-knapp för varje rad
         top_to_remove = None
         for idx, t in enumerate(st.session_state.toppings_lista):
             col_t, col_del = st.columns([4, 1])
@@ -240,46 +252,111 @@ with tab2:
             st.rerun()
 
 # ------------------------------------------
-# Flik 3: Recept (Redigeringsbar + Radera)
+# Flik 3: Recept & Receptbyggare
 # ------------------------------------------
 with tab3:
-    st.subheader("📖 Receptöversikt")
-    col3, _ = st.columns([6, 4])
-    with col3:
-        recept_data = [
-            {
-                "Recept": r_namn,
-                "Kostnad (kr)": float(r_vals.get("override_kostnad", 50.0)),
-                "Kalorier (kcal)": int(r_vals.get("override_kcal", 4000))
-            }
-            for r_namn, r_vals in st.session_state.recept.items()
-        ]
+    st.subheader("📖 Receptöversikt & Byggare")
+    
+    # OM EN EDITERING/SKAPANDE PÅGÅR (UNDERMENY)
+    if st.session_state.aktiv_recept_vy is not None:
+        r_namn_aktiv = st.session_state.aktiv_recept_vy
+        is_new = (r_namn_aktiv == "NYTT")
         
-        df_rec = pd.DataFrame(recept_data)
+        st.markdown(f"### {'➕ Skapa Nytt Recept' if is_new else f'✏️ Redigera Recept: {r_namn_aktiv}'}")
         
-        edited_rec_df = st.data_editor(
-            df_rec,
+        nuvarande_data = st.session_state.recept.get(r_namn_aktiv, {"ingredienser": [], "override_kostnad": 0.0, "override_kcal": 0})
+        
+        recept_namn_input = st.text_input("Receptnamn:", value="" if is_new else r_namn_aktiv)
+        
+        st.markdown("#### Ingredienser i receptet")
+        st.caption("Mängd anges i gram (för kg-varor) eller antal (för st-varor).")
+        
+        df_ing_recept = pd.DataFrame(nuvarande_data.get("ingredienser", []))
+        if df_ing_recept.empty:
+            df_ing_recept = pd.DataFrame([{"Ingrediens": "", "Mängd": 0.0}])
+            
+        alla_ing_namn = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i and i["Ingrediens"]]
+        
+        edited_rec_ing = st.data_editor(
+            df_ing_recept,
             num_rows="dynamic",
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Recept": st.column_config.TextColumn("Recept", width="medium", required=True),
-                "Kostnad (kr)": st.column_config.NumberColumn("Kostnad (kr)", width="small", format="%.2f kr", min_value=0.0),
-                "Kalorier (kcal)": st.column_config.NumberColumn("Kalorier (kcal)", width="small", min_value=0)
+                "Ingrediens": st.column_config.SelectboxColumn("Ingrediens", options=alla_ing_namn, required=True),
+                "Mängd": st.column_config.NumberColumn("Mängd (g / st)", min_value=0.0, step=1.0, format="%.1f")
             },
-            key="recept_editor"
+            key="editor_recept_detaljer"
         )
         
-        # Spara uppdaterat receptbibliotek
-        nytt_recept_dict = {}
-        for row in edited_rec_df.to_dict(orient="records"):
-            r_namn = row.get("Recept")
-            if r_namn:
-                nytt_recept_dict[r_namn] = {
-                    "override_kostnad": float(row.get("Kostnad (kr)", 0.0)),
-                    "override_kcal": int(row.get("Kalorier (kcal)", 0))
-                }
-        st.session_state.recept = nytt_recept_dict
+        # Beräkna live kostnad & kcal
+        ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
+        live_k = 0.0
+        live_kcal = 0
+        rader_dict = edited_rec_ing.to_dict(orient="records")
+        
+        for item in rader_dict:
+            i_namn = item.get("Ingrediens")
+            mängd = float(item.get("Mängd", 0))
+            if i_namn in ing_map:
+                info = ing_map[i_namn]
+                enhet = info.get("Enhet", "kg")
+                faktor = (mängd / 1000.0) if enhet in ["kg", "l"] else mängd
+                live_k += info.get("Pris", 0.0) * faktor
+                live_kcal += int(info.get("Kalorier", 0) * faktor)
+                
+        c_k, c_kc = st.columns(2)
+        c_k.metric("Beräknad Kostnad för sats", f"{live_k:.2f} kr")
+        c_kc.metric("Beräknade Kalorier för sats", f"{live_kcal} kcal")
+        
+        c_spara, c_avbryt = st.columns([1, 1])
+        with c_spara:
+            if st.button("💾 Spara Recept", use_container_width=True):
+                if recept_namn_input.strip():
+                    if not is_new and recept_namn_input != r_namn_aktiv:
+                        del st.session_state.recept[r_namn_aktiv]
+                    
+                    st.session_state.recept[recept_namn_input.strip()] = {
+                        "ingredienser": [r for r in rader_dict if r.get("Ingrediens")],
+                        "override_kostnad": live_k,
+                        "override_kcal": live_kcal
+                    }
+                    st.session_state.aktiv_recept_vy = None
+                    st.rerun()
+                else:
+                    st.error("Ange ett receptnamn!")
+        with c_avbryt:
+            if st.button("❌ Avbryt", use_container_width=True):
+                st.session_state.aktiv_recept_vy = None
+                st.rerun()
+
+    # HUVUDVY FÖR RECEPT
+    else:
+        if st.button("➕ Skapa nytt recept"):
+            st.session_state.aktiv_recept_vy = "NYTT"
+            st.rerun()
+            
+        st.markdown("---")
+        
+        recept_lista_ta_bort = None
+        for r_namn in list(st.session_state.recept.keys()):
+            k, kcal = berakna_recept_totalt(r_namn)
+            col_r1, col_r2, col_r3, col_r4 = st.columns([4, 2, 1, 1])
+            with col_r1:
+                st.write(f"**{r_namn}**")
+            with col_r2:
+                st.caption(f"{k:.2f} kr | {kcal} kcal")
+            with col_r3:
+                if st.button("✏️", key=f"edit_rec_{r_namn}"):
+                    st.session_state.aktiv_recept_vy = r_namn
+                    st.rerun()
+            with col_r4:
+                if st.button("🗑️", key=f"del_rec_{r_namn}"):
+                    recept_lista_ta_bort = r_namn
+
+        if recept_lista_ta_bort:
+            del st.session_state.recept[recept_lista_ta_bort]
+            st.rerun()
 
 # ------------------------------------------
 # Flik 4: Orderbyggare
