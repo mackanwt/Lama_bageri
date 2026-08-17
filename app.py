@@ -14,7 +14,7 @@ st.markdown("""
             color: #3C2A21;
         }
         .block-container {
-            padding-top: 3.5rem !important;
+            padding-top: 3.5rem !important; /* Ger utrymme så loggan inte kapas */
             padding-bottom: 2.0rem !important;
             padding-left: 1.5rem !important;
             padding-right: 1.5rem !important;
@@ -176,56 +176,114 @@ except Exception:
 # ==========================================
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
-# Flik 1: Ingredienser
+# ------------------------------------------
+# Flik 1: Ingredienser (Redigeringsbar + Radera)
+# ------------------------------------------
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
-    col1, _ = st.columns([5, 5])
+    col1, _ = st.columns([6, 4])
     with col1:
-        st.dataframe(
-            pd.DataFrame(st.session_state.ingredienser),
+        df_ing = pd.DataFrame(st.session_state.ingredienser)
+        
+        edited_ing_df = st.data_editor(
+            df_ing,
+            num_rows="dynamic",
+            use_container_width=True,
             hide_index=True,
             column_config={
-                "Ingrediens": st.column_config.TextColumn("Ingrediens", width="medium"),
-                "Pris": st.column_config.NumberColumn("Pris", width="small", format="%.2f kr"),
-                "Enhet": st.column_config.TextColumn("Enhet", width="small"),
-                "Kalorier": st.column_config.NumberColumn("Kalorier", width="small")
-            }
+                "Ingrediens": st.column_config.TextColumn("Ingrediens", width="medium", required=True),
+                "Pris": st.column_config.NumberColumn("Pris", width="small", format="%.2f kr", min_value=0.0),
+                "Enhet": st.column_config.SelectboxColumn("Enhet", width="small", options=["kg", "st", "l", "g"], required=True),
+                "Kalorier": st.column_config.NumberColumn("Kalorier", width="small", min_value=0)
+            },
+            key="ingrediens_editor"
         )
+        
+        # Spara ändringar i session state
+        st.session_state.ingredienser = edited_ing_df.to_dict(orient="records")
 
-# Flik 2: Toppings
+# ------------------------------------------
+# Flik 2: Toppings (Med raderingsknapp per rad)
+# ------------------------------------------
 with tab2:
     st.subheader("🍓 Hantera Toppings")
-    col2, _ = st.columns([4, 6])
+    col2, _ = st.columns([5, 5])
     with col2:
-        alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i]
-        ny_topping = st.selectbox("Välj ingrediens att lägga till i Toppings-listan:", alla_ingredienser)
-        if st.button("➕ Lägg till i Toppings"):
-            if ny_topping not in st.session_state.toppings_lista:
-                st.session_state.toppings_lista.append(ny_topping)
-                st.rerun()
-        st.dataframe(
-            pd.DataFrame([{"Topping": t} for t in st.session_state.toppings_lista]),
-            hide_index=True,
-            column_config={"Topping": st.column_config.TextColumn("Topping", width="medium")}
-        )
+        alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i and i["Ingrediens"]]
+        
+        # Lägg till ny topping
+        st.markdown("##### Lägg till ny topping")
+        c_sel, c_btn = st.columns([3, 2])
+        with c_sel:
+            ny_topping = st.selectbox("Välj ingrediens:", alla_ingredienser, label_visibility="collapsed")
+        with c_btn:
+            if st.button("➕ Lägg till"):
+                if ny_topping and ny_topping not in st.session_state.toppings_lista:
+                    st.session_state.toppings_lista.append(ny_topping)
+                    st.rerun()
 
-# Flik 3: Recept
+        st.markdown("---")
+        st.markdown("##### Befintliga Toppings")
+        
+        # Lista med delete-knapp för varje rad
+        top_to_remove = None
+        for idx, t in enumerate(st.session_state.toppings_lista):
+            col_t, col_del = st.columns([4, 1])
+            with col_t:
+                st.write(f"• **{t}**")
+            with col_del:
+                if st.button("🗑️ Radera", key=f"del_top_{idx}"):
+                    top_to_remove = t
+
+        if top_to_remove:
+            st.session_state.toppings_lista.remove(top_to_remove)
+            st.rerun()
+
+# ------------------------------------------
+# Flik 3: Recept (Redigeringsbar + Radera)
+# ------------------------------------------
 with tab3:
     st.subheader("📖 Receptöversikt")
-    col3, _ = st.columns([4, 6])
+    col3, _ = st.columns([6, 4])
     with col3:
-        recept_rader = [{"Recept": r, "Kostnad": f"{berakna_recept_totalt(r)[0]:.2f} kr", "Kalorier": f"{berakna_recept_totalt(r)[1]} kcal"} for r in st.session_state.recept]
-        st.dataframe(
-            pd.DataFrame(recept_rader),
+        recept_data = [
+            {
+                "Recept": r_namn,
+                "Kostnad (kr)": float(r_vals.get("override_kostnad", 50.0)),
+                "Kalorier (kcal)": int(r_vals.get("override_kcal", 4000))
+            }
+            for r_namn, r_vals in st.session_state.recept.items()
+        ]
+        
+        df_rec = pd.DataFrame(recept_data)
+        
+        edited_rec_df = st.data_editor(
+            df_rec,
+            num_rows="dynamic",
+            use_container_width=True,
             hide_index=True,
             column_config={
-                "Recept": st.column_config.TextColumn("Recept", width="medium"),
-                "Kostnad": st.column_config.TextColumn("Kostnad", width="small"),
-                "Kalorier": st.column_config.TextColumn("Kalorier", width="small")
-            }
+                "Recept": st.column_config.TextColumn("Recept", width="medium", required=True),
+                "Kostnad (kr)": st.column_config.NumberColumn("Kostnad (kr)", width="small", format="%.2f kr", min_value=0.0),
+                "Kalorier (kcal)": st.column_config.NumberColumn("Kalorier (kcal)", width="small", min_value=0)
+            },
+            key="recept_editor"
         )
+        
+        # Spara uppdaterat receptbibliotek
+        nytt_recept_dict = {}
+        for row in edited_rec_df.to_dict(orient="records"):
+            r_namn = row.get("Recept")
+            if r_namn:
+                nytt_recept_dict[r_namn] = {
+                    "override_kostnad": float(row.get("Kostnad (kr)", 0.0)),
+                    "override_kcal": int(row.get("Kalorier (kcal)", 0))
+                }
+        st.session_state.recept = nytt_recept_dict
 
+# ------------------------------------------
 # Flik 4: Orderbyggare
+# ------------------------------------------
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
@@ -258,7 +316,7 @@ with tab4:
         
         nuvarande_order["rader"] = edited_df.to_dict(orient="records")
 
-    ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser}
+    ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
     table_rows = []
     
     tot_bakade = 0
@@ -279,8 +337,8 @@ with tab4:
         if topping_namn != "Ingen" and topping_namn in ing_map:
             t_info = ing_map[topping_namn]
             faktor = mängd_g / 1000.0
-            top_k = t_info["Pris"] * faktor
-            top_kcal = int(t_info["Kalorier"] * faktor)
+            top_k = t_info.get("Pris", 0.0) * faktor
+            top_kcal = int(t_info.get("Kalorier", 0) * faktor)
 
         rad_satser = float(r.get("Satser", 1.0))
         rad_bakade = int(r.get("Bakade", 1))
