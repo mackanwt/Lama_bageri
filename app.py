@@ -14,7 +14,7 @@ st.markdown("""
             color: #3C2A21;
         }
         .block-container {
-            padding-top: 1.0rem !important;
+            padding-top: 3.5rem !important;
             padding-bottom: 2.0rem !important;
             padding-left: 1.5rem !important;
             padding-right: 1.5rem !important;
