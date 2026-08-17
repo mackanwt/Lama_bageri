@@ -8,20 +8,17 @@ st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", in
 # ==========================================
 st.markdown("""
     <style>
-        /* Bakgrund */
         .stApp {
             background-color: #FAF6F0;
             color: #3C2A21;
         }
         .block-container {
-            padding-top: 3.5rem !important; /* Ger utrymme så loggan inte kapas */
+            padding-top: 3.5rem !important;
             padding-bottom: 2.0rem !important;
             padding-left: 1.5rem !important;
             padding-right: 1.5rem !important;
             max-width: 98% !important;
         }
-
-        /* Knappar */
         .stButton>button {
             border-radius: 10px !important;
             background-color: #D9826C !important;
@@ -32,8 +29,6 @@ st.markdown("""
         .stButton>button:hover {
             background-color: #C86D51 !important;
         }
-
-        /* Styling för Flikar */
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px;
             margin-top: 10px;
@@ -49,14 +44,10 @@ st.markdown("""
             background-color: #D9826C !important;
             color: #FFFFFF !important;
         }
-
-        /* Bild-mixmode för transparent logga */
         div[data-testid="stImage"] img {
             mix-blend-mode: multiply;
             object-fit: contain;
         }
-
-        /* Tabellstyling */
         div[data-testid="stDataObjectViz"] td, div[data-testid="stDataObjectViz"] th {
             padding: 5px 8px !important;
             font-size: 13px !important;
@@ -155,7 +146,14 @@ if "orders_db" not in st.session_state:
     st.session_state.orders_db = DEFAULT_ORDERS
 
 if "aktiv_recept_vy" not in st.session_state:
-    st.session_state.aktiv_recept_vy = None  # Kan vara None eller ett receptnamn ("NYTT" för nytt recept)
+    st.session_state.aktiv_recept_vy = None
+
+# Rensning av skräpkolumner från ingrediensdatan
+GILTIGA_KOLUMNER = ["Ingrediens", "Pris", "Enhet", "Kalorier"]
+st.session_state.ingredienser = [
+    {k: v for k, v in i.items() if k in GILTIGA_KOLUMNER}
+    for i in st.session_state.ingredienser
+]
 
 def berakna_recept_totalt(r_namn):
     r_data = st.session_state.recept.get(r_namn, {})
@@ -178,9 +176,7 @@ def berakna_recept_totalt(r_namn):
     else:
         return r_data.get("override_kostnad", 50.0), r_data.get("override_kcal", 4000)
 
-# ==========================================
-# LOGGA HÖGST UPP (SÄKER INLÄSNING)
-# ==========================================
+# LOGGA HÖGST UPP
 try:
     st.image("Logga.jpg", width=80)
 except Exception:
@@ -189,9 +185,7 @@ except Exception:
     except Exception:
         pass
 
-# ==========================================
-# FLIKAR UNDER LOGGAN
-# ==========================================
+# FLIKAR
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
 # ------------------------------------------
@@ -199,9 +193,11 @@ tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Re
 # ------------------------------------------
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
+    st.caption("Klicka på valfri kolumnrubrik (Ingrediens, Pris, Kalorier etc.) för att sortera listan.")
     col1, _ = st.columns([6, 4])
     with col1:
-        df_ing = pd.DataFrame(st.session_state.ingredienser)
+        # Endast giltiga kolumner skickas in i tabellen
+        df_ing = pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER]
         edited_ing_df = st.data_editor(
             df_ing,
             num_rows="dynamic",
@@ -224,7 +220,8 @@ with tab2:
     st.subheader("🍓 Hantera Toppings")
     col2, _ = st.columns([5, 5])
     with col2:
-        alla_ingredienser = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i and i["Ingrediens"]]
+        # Sortera ingredienser i bokstavsordning
+        alla_ingredienser = sorted([i["Ingrediens"] for i in st.session_state.ingredienser if i.get("Ingrediens")])
         
         st.markdown("##### Lägg till ny topping")
         c_sel, c_btn = st.columns([3, 2])
@@ -257,7 +254,6 @@ with tab2:
 with tab3:
     st.subheader("📖 Receptöversikt & Byggare")
     
-    # OM EN EDITERING/SKAPANDE PÅGÅR (UNDERMENY)
     if st.session_state.aktiv_recept_vy is not None:
         r_namn_aktiv = st.session_state.aktiv_recept_vy
         is_new = (r_namn_aktiv == "NYTT")
@@ -265,7 +261,6 @@ with tab3:
         st.markdown(f"### {'➕ Skapa Nytt Recept' if is_new else f'✏️ Redigera Recept: {r_namn_aktiv}'}")
         
         nuvarande_data = st.session_state.recept.get(r_namn_aktiv, {"ingredienser": [], "override_kostnad": 0.0, "override_kcal": 0})
-        
         recept_namn_input = st.text_input("Receptnamn:", value="" if is_new else r_namn_aktiv)
         
         st.markdown("#### Ingredienser i receptet")
@@ -275,7 +270,8 @@ with tab3:
         if df_ing_recept.empty:
             df_ing_recept = pd.DataFrame([{"Ingrediens": "", "Mängd": 0.0}])
             
-        alla_ing_namn = [i["Ingrediens"] for i in st.session_state.ingredienser if "Ingrediens" in i and i["Ingrediens"]]
+        # Sortera ingredienserna i bokstavsordning för dropdowns
+        alla_ing_namn = sorted([i["Ingrediens"] for i in st.session_state.ingredienser if i.get("Ingrediens")])
         
         edited_rec_ing = st.data_editor(
             df_ing_recept,
@@ -289,7 +285,6 @@ with tab3:
             key="editor_recept_detaljer"
         )
         
-        # Beräkna live kostnad & kcal
         ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
         live_k = 0.0
         live_kcal = 0
@@ -330,11 +325,8 @@ with tab3:
                 st.session_state.aktiv_recept_vy = None
                 st.rerun()
 
-# HUVUDVY FÖR RECEPT
     else:
-        # Skapa en avgränsad kolumn (t.ex. bredd 6 av 12) så att listan inte blir för bred
         col_main, _ = st.columns([6, 6])
-        
         with col_main:
             if st.button("➕ Skapa nytt recept"):
                 st.session_state.aktiv_recept_vy = "NYTT"
@@ -343,9 +335,9 @@ with tab3:
             st.markdown("---")
             
             recept_lista_ta_bort = None
-            for r_namn in list(st.session_state.recept.keys()):
+            # Sortera receptnycklarna i bokstavsordning
+            for r_namn in sorted(list(st.session_state.recept.keys())):
                 k, kcal = berakna_recept_totalt(r_namn)
-                # Justerade proportioner för kolumnerna
                 col_r1, col_r2, col_r3, col_r4 = st.columns([4, 4, 1, 1])
                 with col_r1:
                     st.write(f"**{r_namn}**")
@@ -364,7 +356,7 @@ with tab3:
                 st.rerun()
 
 # ------------------------------------------
-# Flik 4: Orderbyggare (Med stöd för flera toppings)
+# Flik 4: Orderbyggare
 # ------------------------------------------
 with tab4:
     st.subheader("🛒 Orderbyggare")
@@ -380,16 +372,20 @@ with tab4:
     st.markdown(f"### {valj_order}")
     st.caption(f"Datum: {nuvarande_order['datum']}")
 
-    # Redigeringssektion
     with st.expander("✏️ Redigera orderrader & toppings", expanded=True):
         rader_ta_bort = []
+        # Sortera receptlistan i bokstavsordning för orderbyggaren
+        recept_lista_sorterad = sorted(list(st.session_state.recept.keys()))
         
         for idx, r in enumerate(nuvarande_order["rader"]):
             st.markdown(f"**Rad {idx+1}: {r.get('Recept', 'Recept')}**")
             c1, c2, c3, c4, c5 = st.columns([3, 2, 2, 2, 1])
             
+            nuvarande_recept = r.get("Recept")
+            idx_recept = recept_lista_sorterad.index(nuvarande_recept) if nuvarande_recept in recept_lista_sorterad else 0
+            
             with c1:
-                r["Recept"] = st.selectbox("Recept", list(st.session_state.recept.keys()), index=list(st.session_state.recept.keys()).index(r.get("Recept", "Muffins")), key=f"rec_{valj_order}_{idx}")
+                r["Recept"] = st.selectbox("Recept", recept_lista_sorterad, index=idx_recept, key=f"rec_{valj_order}_{idx}")
             with c2:
                 r["Satser"] = st.number_input("Satser", min_value=0.1, value=float(r.get("Satser", 1.0)), step=0.1, key=f"sat_{valj_order}_{idx}")
             with c3:
@@ -399,20 +395,17 @@ with tab4:
             with c5:
                 r["Pris_st"] = st.number_input("Pris/st (kr)", min_value=0.0, value=float(r.get("Pris_st", 0.0)), step=0.5, key=f"prs_{valj_order}_{idx}")
 
-            # Hantera flera toppings per rad
             existerande_toppings = r.get("Toppings_dict", {})
-            # Bakåtkompatibilitet om gamla 'Topping'-fältet finns
             if not existerande_toppings and r.get("Topping") and r.get("Topping") != "Ingen":
                 existerande_toppings = {r["Topping"]: r.get("Mängd_g", 0)}
 
             valda_toppings = st.multiselect(
                 "Välj Toppings:",
-                options=st.session_state.toppings_lista,
+                options=sorted(st.session_state.toppings_lista),
                 default=list(existerande_toppings.keys()),
                 key=f"top_multi_{valj_order}_{idx}"
             )
 
-            # Inmatningsfält för mängd per vald topping
             nya_toppings_dict = {}
             if valda_toppings:
                 top_cols = st.columns(len(valda_toppings))
@@ -440,7 +433,7 @@ with tab4:
 
         if st.button("➕ Lägg till ny orderrad"):
             nuvarande_order["rader"].append({
-                "Recept": list(st.session_state.recept.keys())[0],
+                "Recept": recept_lista_sorterad[0] if recept_lista_sorterad else "",
                 "Toppings_dict": {},
                 "Satser": 1.0,
                 "Bakade": 10,
@@ -449,16 +442,14 @@ with tab4:
             })
             st.rerun()
 
-    # Calculation & Tabellvisning
+    # Beräkningar & Sammanställning
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
     table_rows = []
-    
     tot_bakade, tot_salda, tot_kostnad, tot_vinst, tot_pris, tot_kalorier_sats = 0, 0, 0.0, 0.0, 0.0, 0
 
     for r in nuvarande_order["rader"]:
-        rec_k, rec_kcal = berakna_recept_totalt(r.get("Recept", "Muffins"))
+        rec_k, rec_kcal = berakna_recept_totalt(r.get("Recept", ""))
         
-        # Summera ALLA toppings på raden
         top_k_tot = 0.0
         top_kcal_tot = 0
         top_beskrivning_list = []
@@ -482,7 +473,6 @@ with tab4:
         rad_salda = int(r.get("Sålda", 0))
         rad_pris_st = float(r.get("Pris_st", 0.0))
 
-        # Grundrecept * Satser + Alla toppings totalt
         rad_tot_kostnad = (rec_k * rad_satser) + top_k_tot
         rad_kostnad_bakad = rad_tot_kostnad / rad_bakade if rad_bakade > 0 else 0
         rad_kostnad_sald = rad_tot_kostnad / rad_salda if rad_salda > 0 else 0
