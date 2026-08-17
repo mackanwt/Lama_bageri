@@ -330,33 +330,38 @@ with tab3:
                 st.session_state.aktiv_recept_vy = None
                 st.rerun()
 
-    # HUVUDVY FÖR RECEPT
+# HUVUDVY FÖR RECEPT
     else:
-        if st.button("➕ Skapa nytt recept"):
-            st.session_state.aktiv_recept_vy = "NYTT"
-            st.rerun()
-            
-        st.markdown("---")
+        # Skapa en avgränsad kolumn (t.ex. bredd 6 av 12) så att listan inte blir för bred
+        col_main, _ = st.columns([6, 6])
         
-        recept_lista_ta_bort = None
-        for r_namn in list(st.session_state.recept.keys()):
-            k, kcal = berakna_recept_totalt(r_namn)
-            col_r1, col_r2, col_r3, col_r4 = st.columns([4, 2, 1, 1])
-            with col_r1:
-                st.write(f"**{r_namn}**")
-            with col_r2:
-                st.caption(f"{k:.2f} kr | {kcal} kcal")
-            with col_r3:
-                if st.button("✏️", key=f"edit_rec_{r_namn}"):
-                    st.session_state.aktiv_recept_vy = r_namn
-                    st.rerun()
-            with col_r4:
-                if st.button("🗑️", key=f"del_rec_{r_namn}"):
-                    recept_lista_ta_bort = r_namn
+        with col_main:
+            if st.button("➕ Skapa nytt recept"):
+                st.session_state.aktiv_recept_vy = "NYTT"
+                st.rerun()
+                
+            st.markdown("---")
+            
+            recept_lista_ta_bort = None
+            for r_namn in list(st.session_state.recept.keys()):
+                k, kcal = berakna_recept_totalt(r_namn)
+                # Justerade proportioner för kolumnerna
+                col_r1, col_r2, col_r3, col_r4 = st.columns([4, 4, 1, 1])
+                with col_r1:
+                    st.write(f"**{r_namn}**")
+                with col_r2:
+                    st.caption(f"{k:.2f} kr | {kcal} kcal")
+                with col_r3:
+                    if st.button("✏️", key=f"edit_rec_{r_namn}"):
+                        st.session_state.aktiv_recept_vy = r_namn
+                        st.rerun()
+                with col_r4:
+                    if st.button("🗑️", key=f"del_rec_{r_namn}"):
+                        recept_lista_ta_bort = r_namn
 
-        if recept_lista_ta_bort:
-            del st.session_state.recept[recept_lista_ta_bort]
-            st.rerun()
+            if recept_lista_ta_bort:
+                del st.session_state.recept[recept_lista_ta_bort]
+                st.rerun()
 
 # ------------------------------------------
 # Flik 4: Orderbyggare
