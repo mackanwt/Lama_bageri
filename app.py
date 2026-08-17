@@ -370,7 +370,13 @@ with tab4:
     st.subheader("🛒 Orderbyggare")
     
     valj_order_nycklar = list(st.session_state.orders_db.keys())
-    valj_order = st.selectbox("📋 Välj order att granska eller redigera:", valj_order_nycklar)
+    
+    # Formaterar visningen i rullgardinsmenyn så att datumet hamnar i parentes efter ordernamnet
+    valj_order = st.selectbox(
+        "📋 Välj order att granska eller redigera:", 
+        valj_order_nycklar,
+        format_func=lambda x: f"{x} ({st.session_state.orders_db[x]['datum']})"
+    )
 
     nuvarande_order = st.session_state.orders_db[valj_order]
     
