@@ -52,6 +52,13 @@ st.markdown("""
             padding: 5px 8px !important;
             font-size: 13px !important;
         }
+        /* Lås kolumnbredder genom att inaktivera kolumndragning i tabeller */
+        [data-testid="stDataFrame"] [role="columnheader"] div {
+            pointer-events: auto;
+        }
+        .glideDataEditor .gdg-header-resize-handle {
+            display: none !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -148,7 +155,12 @@ if "orders_db" not in st.session_state:
 if "aktiv_recept_vy" not in st.session_state:
     st.session_state.aktiv_recept_vy = None
 
-# Rensning av skräpkolumner från ingrediensdatan
+if "sort_col" not in st.session_state:
+    st.session_state.sort_col = "Ingrediens"
+
+if "sort_asc" not in st.session_state:
+    st.session_state.sort_asc = True
+
 GILTIGA_KOLUMNER = ["Ingrediens", "Pris", "Enhet", "Kalorier"]
 st.session_state.ingredienser = [
     {k: v for k, v in i.items() if k in GILTIGA_KOLUMNER}
@@ -193,21 +205,50 @@ tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Re
 # ------------------------------------------
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
-    st.caption("Klicka på valfri kolumnrubrik (Ingrediens, Pris, Kalorier etc.) för att sortera listan.")
-    col1, _ = st.columns([6, 4])
-    with col1:
-        # Endast giltiga kolumner skickas in i tabellen
-        df_ing = pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER]
+    
+    # Sorteringskontroller för stabil sortering
+    sc1, sc2, sc3, sc4 = st.columns([2, 2, 2, 4])
+    with sc1:
+        if st.button("🔤 Sortera: Ingrediens"):
+            st.session_state.sort_asc = not st.session_state.sort_asc if st.session_state.sort_col == "Ingrediens" else True
+            st.session_state.sort_col = "Ingrediens"
+            st.rerun()
+    with sc2:
+        if st.button("💰 Sortera: Pris"):
+            st.session_state.sort_asc = not st.session_state.sort_asc if st.session_state.sort_col == "Pris" else True
+            st.session_state.sort_col = "Pris"
+            st.rerun()
+    with sc3:
+        if st.button("🔥 Sortera: Kalorier"):
+            st.session_state.sort_asc = not st.session_state.sort_asc if st.session_state.sort_col == "Kalorier" else True
+            st.session_state.sort_col = "Kalorier"
+            st.rerun()
+
+    df_ing = pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER]
+    df_ing = df_ing.sort_values(by=st.session_state.sort_col, ascending=st.session_state.sort_asc)
+
+    # Visning med st.dataframe (stödjer klickbar sortering på rubriker och har låsta bredder)
+    st.dataframe(
+        df_ing,
+        hide_index=True,
+        column_config={
+            "Ingrediens": st.column_config.TextColumn("Ingrediens", width=220),
+            "Pris": st.column_config.NumberColumn("Pris", width=100, format="%.2f kr"),
+            "Enhet": st.column_config.TextColumn("Enhet", width=70),
+            "Kalorier": st.column_config.NumberColumn("Kalorier", width=100)
+        }
+    )
+
+    with st.expander("➕ / ✏️ Lägg till eller redigera ingredienser"):
         edited_ing_df = st.data_editor(
-            df_ing,
+            pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER],
             num_rows="dynamic",
-            use_container_width=True,
             hide_index=True,
             column_config={
-                "Ingrediens": st.column_config.TextColumn("Ingrediens", width="medium", required=True),
-                "Pris": st.column_config.NumberColumn("Pris", width="small", format="%.2f kr", min_value=0.0),
-                "Enhet": st.column_config.SelectboxColumn("Enhet", width="small", options=["kg", "st", "l", "g"], required=True),
-                "Kalorier": st.column_config.NumberColumn("Kalorier", width="small", min_value=0)
+                "Ingrediens": st.column_config.TextColumn("Ingrediens", width=200, required=True),
+                "Pris": st.column_config.NumberColumn("Pris", width=90, format="%.2f kr", min_value=0.0),
+                "Enhet": st.column_config.SelectboxColumn("Enhet", width=70, options=["kg", "st", "l", "g"], required=True),
+                "Kalorier": st.column_config.NumberColumn("Kalorier", width=90, min_value=0)
             },
             key="ingrediens_editor"
         )
@@ -220,7 +261,6 @@ with tab2:
     st.subheader("🍓 Hantera Toppings")
     col2, _ = st.columns([5, 5])
     with col2:
-        # Sortera ingredienser i bokstavsordning
         alla_ingredienser = sorted([i["Ingrediens"] for i in st.session_state.ingredienser if i.get("Ingrediens")])
         
         st.markdown("##### Lägg till ny topping")
@@ -270,17 +310,16 @@ with tab3:
         if df_ing_recept.empty:
             df_ing_recept = pd.DataFrame([{"Ingrediens": "", "Mängd": 0.0}])
             
-        # Sortera ingredienserna i bokstavsordning för dropdowns
         alla_ing_namn = sorted([i["Ingrediens"] for i in st.session_state.ingredienser if i.get("Ingrediens")])
         
+        # Exakta kolumnbredder
         edited_rec_ing = st.data_editor(
             df_ing_recept,
             num_rows="dynamic",
-            use_container_width=True,
             hide_index=True,
             column_config={
-                "Ingrediens": st.column_config.SelectboxColumn("Ingrediens", options=alla_ing_namn, required=True),
-                "Mängd": st.column_config.NumberColumn("Mängd (g / st)", min_value=0.0, step=1.0, format="%.1f")
+                "Ingrediens": st.column_config.SelectboxColumn("Ingrediens", width=220, options=alla_ing_namn, required=True),
+                "Mängd": st.column_config.NumberColumn("Mängd (g / st)", width=130, min_value=0.0, step=1.0, format="%.1f")
             },
             key="editor_recept_detaljer"
         )
@@ -335,7 +374,6 @@ with tab3:
             st.markdown("---")
             
             recept_lista_ta_bort = None
-            # Sortera receptnycklarna i bokstavsordning
             for r_namn in sorted(list(st.session_state.recept.keys())):
                 k, kcal = berakna_recept_totalt(r_namn)
                 col_r1, col_r2, col_r3, col_r4 = st.columns([4, 4, 1, 1])
@@ -374,7 +412,6 @@ with tab4:
 
     with st.expander("✏️ Redigera orderrader & toppings", expanded=True):
         rader_ta_bort = []
-        # Sortera receptlistan i bokstavsordning för orderbyggaren
         recept_lista_sorterad = sorted(list(st.session_state.recept.keys()))
         
         for idx, r in enumerate(nuvarande_order["rader"]):
@@ -442,7 +479,7 @@ with tab4:
             })
             st.rerun()
 
-    # Beräkningar & Sammanställning
+    # Beräkningar & Tabellvisning
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
     table_rows = []
     tot_bakade, tot_salda, tot_kostnad, tot_vinst, tot_pris, tot_kalorier_sats = 0, 0, 0.0, 0.0, 0.0, 0
@@ -575,4 +612,27 @@ with tab4:
     styled_df = df_display.style.apply(fargkoda_kolumner, axis=None)
 
     st.markdown("#### 📊 Sammanställning & Kalkyl")
-    st.dataframe(styled_df, hide_index=True, use_container_width=True)
+    # Låsta kompakta kolumnbredder för Flik 4
+    st.dataframe(
+        styled_df,
+        hide_index=True,
+        column_config={
+            "Recept": st.column_config.TextColumn("Recept", width=110),
+            "Toppings": st.column_config.TextColumn("Toppings", width=130),
+            "Mängd": st.column_config.TextColumn("Mängd", width=70),
+            "Topping kr": st.column_config.TextColumn("Topping kr", width=90),
+            "Topping kcal": st.column_config.TextColumn("Topping kcal", width=100),
+            "Satser": st.column_config.TextColumn("Satser", width=65),
+            "Bakade": st.column_config.TextColumn("Bakade", width=70),
+            "Sålda": st.column_config.TextColumn("Sålda", width=65),
+            "Kostnad": st.column_config.TextColumn("Kostnad", width=75),
+            "Kostnad/bakad kaka": st.column_config.TextColumn("Kostnad/bakad kaka", width=130),
+            "Kostnad/såld kaka": st.column_config.TextColumn("Kostnad/såld kaka", width=120),
+            "Pris/cookie": st.column_config.TextColumn("Pris/cookie", width=90),
+            "vinstpåslag": st.column_config.TextColumn("vinstpåslag", width=90),
+            "vinst": st.column_config.TextColumn("vinst", width=70),
+            "Pris": st.column_config.TextColumn("Pris", width=70),
+            "Kalorier/sats": st.column_config.TextColumn("Kalorier/sats", width=100),
+            "Kalorier/st": st.column_config.TextColumn("Kalorier/st", width=90)
+        }
+    )
