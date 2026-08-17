@@ -48,51 +48,6 @@ st.markdown("""
             mix-blend-mode: multiply;
             object-fit: contain;
         }
-
-        /* Anpassad låst HTML-tabell */
-        .custom-table-container {
-            display: inline-block;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #E2E8F0;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 1rem;
-        }
-        .custom-table {
-            border-collapse: collapse;
-            font-size: 14px;
-            color: #1E293B;
-            width: auto;
-        }
-        .custom-table th {
-            background-color: #F8FAFC;
-            color: #64748B;
-            font-weight: 600;
-            text-align: left;
-            padding: 10px 14px;
-            border-bottom: 1px solid #E2E8F0;
-            user-select: none;
-            white-space: nowrap;
-        }
-        .custom-table th.sortable {
-            cursor: pointer;
-        }
-        .custom-table th.sortable:hover {
-            background-color: #F1F5F9;
-            color: #0F172A;
-        }
-        .custom-table td {
-            padding: 8px 14px;
-            border-bottom: 1px solid #F1F5F9;
-            white-space: nowrap;
-        }
-        .custom-table tr:last-child td {
-            border-bottom: none;
-        }
-        .custom-table .text-right {
-            text-align: right;
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -189,12 +144,6 @@ if "orders_db" not in st.session_state:
 if "aktiv_recept_vy" not in st.session_state:
     st.session_state.aktiv_recept_vy = None
 
-if "sort_col" not in st.session_state:
-    st.session_state.sort_col = "Ingrediens"
-
-if "sort_asc" not in st.session_state:
-    st.session_state.sort_asc = True
-
 GILTIGA_KOLUMNER = ["Ingrediens", "Pris", "Enhet", "Kalorier"]
 
 def berakna_recept_totalt(r_namn):
@@ -235,60 +184,21 @@ tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Re
 # ------------------------------------------
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
-    st.caption("Klicka på knappen nedanför eller rubrikknapparna för att sortera.")
 
-    # Sorteringshantering
     df_ing = pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER]
-    df_ing = df_ing.sort_values(by=st.session_state.sort_col, ascending=st.session_state.sort_asc)
 
-    # Sorteringsknappar tätt intill varandra
-    col_s1, col_s2, col_s3, _ = st.columns([1.5, 1.2, 1.4, 5])
-    with col_s1:
-        if st.button(f"Ingrediens {'↑' if st.session_state.sort_col=='Ingrediens' and st.session_state.sort_asc else '↓'}"):
-            st.session_state.sort_asc = not st.session_state.sort_asc if st.session_state.sort_col == "Ingrediens" else True
-            st.session_state.sort_col = "Ingrediens"
-            st.rerun()
-    with col_s2:
-        if st.button(f"Pris {'↑' if st.session_state.sort_col=='Pris' and st.session_state.sort_asc else '↓'}"):
-            st.session_state.sort_asc = not st.session_state.sort_asc if st.session_state.sort_col == "Pris" else True
-            st.session_state.sort_col = "Pris"
-            st.rerun()
-    with col_s3:
-        if st.button(f"Kalorier {'↑' if st.session_state.sort_col=='Kalorier' and st.session_state.sort_asc else '↓'}"):
-            st.session_state.sort_asc = not st.session_state.sort_asc if st.session_state.sort_col == "Kalorier" else True
-            st.session_state.sort_col = "Kalorier"
-            st.rerun()
-
-    # Generera helt låst HTML-tabell utan manuella ändringshandtag
-    html_rows = ""
-    for _, row in df_ing.iterrows():
-        html_rows += f"""
-        <tr>
-            <td>{row['Ingrediens']}</td>
-            <td class="text-right">{row['Pris']:.2f} kr</td>
-            <td>{row['Enhet']}</td>
-            <td class="text-right">{row['Kalorier']}</td>
-        </tr>
-        """
-
-    html_table = f"""
-    <div class="custom-table-container">
-        <table class="custom-table">
-            <thead>
-                <tr>
-                    <th>Ingrediens</th>
-                    <th class="text-right">Pris</th>
-                    <th>Enhet</th>
-                    <th class="text-right">Kalorier</th>
-                </tr>
-            </thead>
-            <tbody>
-                {html_rows}
-            </tbody>
-        </table>
-    </div>
-    """
-    st.markdown(html_table, unsafe_allow_html=True)
+    # Kompakt tabell med fasta kolumnbredder och inbyggd klickbar sortering på rubrikerna
+    st.dataframe(
+        df_ing,
+        use_container_width=False,
+        hide_index=True,
+        column_config={
+            "Ingrediens": st.column_config.TextColumn("Ingrediens", width=220),
+            "Pris": st.column_config.NumberColumn("Pris", width=100, format="%.2f kr"),
+            "Enhet": st.column_config.TextColumn("Enhet", width=80),
+            "Kalorier": st.column_config.NumberColumn("Kalorier", width=100, format="%d")
+        }
+    )
 
     with st.expander("➕ / ✏️ Lägg till eller redigera ingredienser"):
         edited_ing_df = st.data_editor(
