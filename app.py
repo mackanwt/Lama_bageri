@@ -364,14 +364,12 @@ with tab3:
                 st.rerun()
 
 # ------------------------------------------
-# Flik 4: Orderbyggare
+# Flik 4: Orderbyggare (Med stöd för flera toppings)
 # ------------------------------------------
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
     valj_order_nycklar = list(st.session_state.orders_db.keys())
-    
-    # Formaterar visningen i rullgardinsmenyn så att datumet hamnar i parentes efter ordernamnet
     valj_order = st.selectbox(
         "📋 Välj order att granska eller redigera:", 
         valj_order_nycklar,
@@ -379,61 +377,113 @@ with tab4:
     )
 
     nuvarande_order = st.session_state.orders_db[valj_order]
-    
     st.markdown(f"### {valj_order}")
     st.caption(f"Datum: {nuvarande_order['datum']}")
 
-    with st.expander("✏️ Redigera orderrader direkt i tabellen", expanded=True):
-        df_edit = pd.DataFrame(nuvarande_order["rader"])
+    # Redigeringssektion
+    with st.expander("✏️ Redigera orderrader & toppings", expanded=True):
+        rader_ta_bort = []
         
-        edited_df = st.data_editor(
-            df_edit,
-            num_rows="dynamic",
-            use_container_width=True,
-            column_config={
-                "Recept": st.column_config.SelectboxColumn("Recept", options=list(st.session_state.recept.keys()), required=True),
-                "Topping": st.column_config.SelectboxColumn("Topping", options=["Ingen"] + st.session_state.toppings_lista, required=True),
-                "Mängd_g": st.column_config.NumberColumn("Mängd (g)", min_value=0, step=10),
-                "Satser": st.column_config.NumberColumn("Satser", min_value=0.1, step=0.1, format="%.1f"),
-                "Bakade": st.column_config.NumberColumn("Bakade (st)", min_value=1, step=1),
-                "Sålda": st.column_config.NumberColumn("Sålda (st)", min_value=0, step=1),
-                "Pris_st": st.column_config.NumberColumn("Pris/st (kr)", min_value=0.0, step=0.5, format="%.1f kr")
-            },
-            key=f"editor_{valj_order}"
-        )
-        
-        nuvarande_order["rader"] = edited_df.to_dict(orient="records")
+        for idx, r in enumerate(nuvarande_order["rader"]):
+            st.markdown(f"**Rad {idx+1}: {r.get('Recept', 'Recept')}**")
+            c1, c2, c3, c4, c5 = st.columns([3, 2, 2, 2, 1])
+            
+            with c1:
+                r["Recept"] = st.selectbox("Recept", list(st.session_state.recept.keys()), index=list(st.session_state.recept.keys()).index(r.get("Recept", "Muffins")), key=f"rec_{valj_order}_{idx}")
+            with c2:
+                r["Satser"] = st.number_input("Satser", min_value=0.1, value=float(r.get("Satser", 1.0)), step=0.1, key=f"sat_{valj_order}_{idx}")
+            with c3:
+                r["Bakade"] = st.number_input("Bakade (st)", min_value=1, value=int(r.get("Bakade", 1)), key=f"bak_{valj_order}_{idx}")
+            with c4:
+                r["Sålda"] = st.number_input("Sålda (st)", min_value=0, value=int(r.get("Sålda", 0)), key=f"sal_{valj_order}_{idx}")
+            with c5:
+                r["Pris_st"] = st.number_input("Pris/st (kr)", min_value=0.0, value=float(r.get("Pris_st", 0.0)), step=0.5, key=f"prs_{valj_order}_{idx}")
 
+            # Hantera flera toppings per rad
+            existerande_toppings = r.get("Toppings_dict", {})
+            # Bakåtkompatibilitet om gamla 'Topping'-fältet finns
+            if not existerande_toppings and r.get("Topping") and r.get("Topping") != "Ingen":
+                existerande_toppings = {r["Topping"]: r.get("Mängd_g", 0)}
+
+            valda_toppings = st.multiselect(
+                "Välj Toppings:",
+                options=st.session_state.toppings_lista,
+                default=list(existerande_toppings.keys()),
+                key=f"top_multi_{valj_order}_{idx}"
+            )
+
+            # Inmatningsfält för mängd per vald topping
+            nya_toppings_dict = {}
+            if valda_toppings:
+                top_cols = st.columns(len(valda_toppings))
+                for t_idx, t_namn in enumerate(valda_toppings):
+                    with top_cols[t_idx]:
+                        start_mängd = float(existerande_toppings.get(t_namn, 50))
+                        nya_toppings_dict[t_namn] = st.number_input(
+                            f"Mängd {t_namn} (g/st):",
+                            min_value=0.0,
+                            value=start_mängd,
+                            step=5.0,
+                            key=f"mngd_{valj_order}_{idx}_{t_namn}"
+                        )
+            
+            r["Toppings_dict"] = nya_toppings_dict
+            
+            if st.button("🗑️ Ta bort rad", key=f"del_row_{valj_order}_{idx}"):
+                rader_ta_bort.append(idx)
+            st.markdown("---")
+
+        if rader_ta_bort:
+            for index in sorted(rader_ta_bort, reverse=True):
+                nuvarande_order["rader"].pop(index)
+            st.rerun()
+
+        if st.button("➕ Lägg till ny orderrad"):
+            nuvarande_order["rader"].append({
+                "Recept": list(st.session_state.recept.keys())[0],
+                "Toppings_dict": {},
+                "Satser": 1.0,
+                "Bakade": 10,
+                "Sålda": 10,
+                "Pris_st": 15.0
+            })
+            st.rerun()
+
+    # Calculation & Tabellvisning
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
     table_rows = []
     
-    tot_bakade = 0
-    tot_salda = 0
-    tot_kostnad = 0.0
-    tot_vinst = 0.0
-    tot_pris = 0.0
-    tot_kalorier_sats = 0
+    tot_bakade, tot_salda, tot_kostnad, tot_vinst, tot_pris, tot_kalorier_sats = 0, 0, 0.0, 0.0, 0.0, 0
 
     for r in nuvarande_order["rader"]:
         rec_k, rec_kcal = berakna_recept_totalt(r.get("Recept", "Muffins"))
         
-        top_k = 0.0
-        top_kcal = 0
-        topping_namn = r.get("Topping", "Ingen")
-        mängd_g = r.get("Mängd_g", 0)
-        
-        if topping_namn != "Ingen" and topping_namn in ing_map:
-            t_info = ing_map[topping_namn]
-            faktor = mängd_g / 1000.0
-            top_k = t_info.get("Pris", 0.0) * faktor
-            top_kcal = int(t_info.get("Kalorier", 0) * faktor)
+        # Summera ALLA toppings på raden
+        top_k_tot = 0.0
+        top_kcal_tot = 0
+        top_beskrivning_list = []
+        top_mängd_list = []
+
+        top_dict = r.get("Toppings_dict", {})
+        for t_namn, m_g in top_dict.items():
+            if t_namn in ing_map and m_g > 0:
+                t_info = ing_map[t_namn]
+                enhet = t_info.get("Enhet", "kg")
+                faktor = (m_g / 1000.0) if enhet in ["kg", "l"] else m_g
+                
+                top_k_tot += t_info.get("Pris", 0.0) * faktor
+                top_kcal_tot += int(t_info.get("Kalorier", 0) * faktor)
+                
+                top_beskrivning_list.append(t_namn)
+                top_mängd_list.append(f"{int(m_g)}g" if enhet == "kg" else f"{int(m_g)}st")
 
         rad_satser = float(r.get("Satser", 1.0))
         rad_bakade = int(r.get("Bakade", 1))
         rad_salda = int(r.get("Sålda", 0))
         rad_pris_st = float(r.get("Pris_st", 0.0))
 
-        rad_tot_kostnad = (rec_k * rad_satser) + top_k
+        # Grundrecept * Satser + Alla toppings totalt
+        rad_tot_kostnad = (rec_k * rad_satser) + top_k_tot
         rad_kostnad_bakad = rad_tot_kostnad / rad_bakade if rad_bakade > 0 else 0
         rad_kostnad_sald = rad_tot_kostnad / rad_salda if rad_salda > 0 else 0
         
@@ -441,7 +491,7 @@ with tab4:
         rad_vinst = rad_tot_intakt - rad_tot_kostnad
         rad_vinstpaslag = (rad_vinst / rad_tot_kostnad * 100) if rad_tot_kostnad > 0 else 0
         
-        rad_kalorier_sats = int((rec_kcal * rad_satser) + top_kcal)
+        rad_kalorier_sats = int((rec_kcal * rad_satser) + top_kcal_tot)
         rad_kalorier_st = int(rad_kalorier_sats / rad_bakade) if rad_bakade > 0 else 0
 
         tot_bakade += rad_bakade
@@ -453,10 +503,10 @@ with tab4:
 
         table_rows.append({
             "Recept": r.get("Recept", ""),
-            "Toppings": topping_namn if topping_namn != "Ingen" else "",
-            "Mängd": f"{mängd_g} g" if topping_namn != "Ingen" else "",
-            "Topping kr": f"{top_k:.2f} kr" if top_k > 0 else "",
-            "Topping kcal": f"{top_kcal} kcal" if top_kcal > 0 else "",
+            "Toppings": ", ".join(top_beskrivning_list) if top_beskrivning_list else "-",
+            "Mängd": ", ".join(top_mängd_list) if top_mängd_list else "-",
+            "Topping kr": f"{top_k_tot:.2f} kr" if top_k_tot > 0 else "-",
+            "Topping kcal": f"{top_kcal_tot} kcal" if top_kcal_tot > 0 else "-",
             "Satser": f"{rad_satser:.1f}",
             "Bakade": f"{rad_bakade} st",
             "Sålda": f"{rad_salda} st",
@@ -497,7 +547,6 @@ with tab4:
 
     def fargkoda_kolumner(df):
         styles = pd.DataFrame('', index=df.index, columns=df.columns)
-        
         farger = {
             "grå": "background-color: #E2E8F0; color: #1E293B;",
             "gul": "background-color: #FEF9C3; color: #713F12;",
