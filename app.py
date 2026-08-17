@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 
 st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
@@ -51,15 +50,10 @@ st.markdown("""
             color: #FFFFFF !important;
         }
 
-        /* Logga styling för att förhindra kapning */
-        .logo-container {
-            margin-top: 15px;
-            margin-bottom: 5px;
-        }
-        .logo-container img {
-            max-height: 70px;
-            object-fit: contain;
+        /* Bild-mixmode för transparent logga */
+        div[data-testid="stImage"] img {
             mix-blend-mode: multiply;
+            object-fit: contain;
         }
 
         /* Tabellstyling */
@@ -167,22 +161,22 @@ def berakna_recept_totalt(r_namn):
     return 50.0, 4000
 
 # ==========================================
-# LOGGA HÖGST UPP TILL VÄNSTER (EJ KAPAD)
+# LOGGA HÖGST UPP (SÄKER INLÄSNING)
 # ==========================================
-logo_path = "Logga.jpg" if os.path.exists("Logga.jpg") else ("Logga.png" if os.path.exists("Logga.png") else None)
-if logo_path:
-    import base64
-    with open(logo_path, "rb") as f:
-        img_bytes = f.read()
-    encoded = base64.b64encode(img_bytes).decode()
-    st.markdown(f'<div class="logo-container"><img src="data:image/png;base64,{encoded}"></div>', unsafe_allow_html=True)
+try:
+    st.image("Logga.jpg", width=80)
+except Exception:
+    try:
+        st.image("Logga.png", width=80)
+    except Exception:
+        pass
 
 # ==========================================
 # FLIKAR UNDER LOGGAN
 # ==========================================
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
-# Flik 1: Ingredienser (Smala kolumner)
+# Flik 1: Ingredienser
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
     col1, _ = st.columns([5, 5])
@@ -198,7 +192,7 @@ with tab1:
             }
         )
 
-# Flik 2: Toppings (Smala kolumner)
+# Flik 2: Toppings
 with tab2:
     st.subheader("🍓 Hantera Toppings")
     col2, _ = st.columns([4, 6])
@@ -215,7 +209,7 @@ with tab2:
             column_config={"Topping": st.column_config.TextColumn("Topping", width="medium")}
         )
 
-# Flik 3: Recept (Smala kolumner)
+# Flik 3: Recept
 with tab3:
     st.subheader("📖 Receptöversikt")
     col3, _ = st.columns([4, 6])
@@ -231,7 +225,7 @@ with tab3:
             }
         )
 
-# Flik 4: Orderbyggare (Full bredd)
+# Flik 4: Orderbyggare
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
