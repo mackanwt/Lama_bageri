@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+import requests
+import json
+import base64
 
 st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
@@ -50,6 +53,13 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
+# ==========================================
+# GITHUB INTEGRATION
+# ==========================================
+GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
+GITHUB_REPO = st.secrets.get("GITHUB_REPO", "")
+FILE_PATH = "bageri_data.json"
 
 # ==========================================
 # DEFAULT DATA
@@ -129,17 +139,69 @@ DEFAULT_ORDERS = {
     }
 }
 
-if "ingredienser" not in st.session_state:
-    st.session_state.ingredienser = DEFAULT_INGREDIENSER
+ALL_DEFAULT_DATA = {
+    "ingredienser": DEFAULT_INGREDIENSER,
+    "toppings_lista": DEFAULT_TOPPINGS,
+    "recept": DEFAULT_RECEPT,
+    "orders_db": DEFAULT_ORDERS
+}
 
-if "toppings_lista" not in st.session_state:
-    st.session_state.toppings_lista = DEFAULT_TOPPINGS
+def load_data_from_github():
+    if not GITHUB_TOKEN or not GITHUB_REPO:
+        return ALL_DEFAULT_DATA
+    
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    
+    try:
+        res = requests.get(url, headers=headers)
+        if res.status_code == 200:
+            content = res.json()["content"]
+            decoded_data = base64.b64decode(content).decode('utf-8')
+            loaded = json.loads(decoded_data)
+            return loaded
+    except Exception:
+        pass
 
-if "recept" not in st.session_state:
-    st.session_state.recept = DEFAULT_RECEPT
+    return ALL_DEFAULT_DATA
 
-if "orders_db" not in st.session_state:
-    st.session_state.orders_db = DEFAULT_ORDERS
+def save_data_to_github(data_dict):
+    if not GITHUB_TOKEN or not GITHUB_REPO:
+        st.warning("GITHUB_TOKEN eller GITHUB_REPO saknas i Secrets.")
+        return
+
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    sha = None
+    res_get = requests.get(url, headers=headers)
+    if res_get.status_code == 200:
+        sha = res_get.json()["sha"]
+
+    json_str = json.dumps(data_dict, indent=4, ensure_ascii=False)
+    encoded_content = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
+
+    payload = {
+        "message": "Uppdaterade bageridata [via Streamlit]",
+        "content": encoded_content
+    }
+    if sha:
+        payload["sha"] = sha
+
+    res_put = requests.put(url, headers=headers, json=payload)
+    if res_put.status_code not in [200, 201]:
+        st.error(f"Kunde inte spara till GitHub: {res_put.text}")
+
+# Ladda data från GitHub vid start
+if "bageri_data" not in st.session_state:
+    st.session_state.bageri_data = load_data_from_github()
+
+# Synkronisera Session State
+bageri_data = st.session_state.bageri_data
+st.session_state.ingredienser = bageri_data.get("ingredienser", DEFAULT_INGREDIENSER)
+st.session_state.toppings_lista = bageri_data.get("toppings_lista", DEFAULT_TOPPINGS)
+st.session_state.recept = bageri_data.get("recept", DEFAULT_RECEPT)
+st.session_state.orders_db = bageri_data.get("orders_db", DEFAULT_ORDERS)
 
 if "aktiv_recept_vy" not in st.session_state:
     st.session_state.aktiv_recept_vy = None
@@ -167,6 +229,15 @@ def berakna_recept_totalt(r_namn):
     else:
         return r_data.get("override_kostnad", 50.0), r_data.get("override_kcal", 4000)
 
+def spara_allt():
+    st.session_state.bageri_data = {
+        "ingredienser": st.session_state.ingredienser,
+        "toppings_lista": st.session_state.toppings_lista,
+        "recept": st.session_state.recept,
+        "orders_db": st.session_state.orders_db
+    }
+    save_data_to_github(st.session_state.bageri_data)
+
 # LOGGA HÖGST UPP
 try:
     st.image("Logga.jpg", width=80)
@@ -187,7 +258,6 @@ with tab1:
 
     df_ing = pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER]
 
-    # Kompakt tabell med fasta kolumnbredder och inbyggd klickbar sortering på rubrikerna
     st.dataframe(
         df_ing,
         use_container_width=False,
@@ -213,7 +283,11 @@ with tab1:
             },
             key="ingrediens_editor"
         )
-        st.session_state.ingredienser = edited_ing_df.to_dict(orient="records")
+        if st.button("💾 Spara ändringar i Ingredienser", type="primary"):
+            st.session_state.ingredienser = edited_ing_df.to_dict(orient="records")
+            spara_allt()
+            st.success("Ingredienser sparades!")
+            st.rerun()
 
 # ------------------------------------------
 # Flik 2: Toppings
@@ -232,6 +306,8 @@ with tab2:
             if st.button("➕ Lägg till"):
                 if ny_topping and ny_topping not in st.session_state.toppings_lista:
                     st.session_state.toppings_lista.append(ny_topping)
+                    spara_allt()
+                    st.success("Topping tillagd!")
                     st.rerun()
 
         st.markdown("---")
@@ -247,6 +323,8 @@ with tab2:
 
         if top_to_remove:
             st.session_state.toppings_lista.remove(top_to_remove)
+            spara_allt()
+            st.success("Topping raderad!")
             st.rerun()
 
 # ------------------------------------------
@@ -305,7 +383,7 @@ with tab3:
         
         c_spara, c_avbryt = st.columns([1, 1])
         with c_spara:
-            if st.button("💾 Spara Recept", use_container_width=True):
+            if st.button("💾 Spara Recept", use_container_width=True, type="primary"):
                 if recept_namn_input.strip():
                     if not is_new and recept_namn_input != r_namn_aktiv:
                         del st.session_state.recept[r_namn_aktiv]
@@ -315,7 +393,9 @@ with tab3:
                         "override_kostnad": live_k,
                         "override_kcal": live_kcal
                     }
+                    spara_allt()
                     st.session_state.aktiv_recept_vy = None
+                    st.success("Receptet sparades!")
                     st.rerun()
                 else:
                     st.error("Ange ett receptnamn!")
@@ -351,6 +431,7 @@ with tab3:
 
             if recept_lista_ta_bort:
                 del st.session_state.recept[recept_lista_ta_bort]
+                spara_allt()
                 st.rerun()
 
 # ------------------------------------------
@@ -426,18 +507,26 @@ with tab4:
         if rader_ta_bort:
             for index in sorted(rader_ta_bort, reverse=True):
                 nuvarande_order["rader"].pop(index)
+            spara_allt()
             st.rerun()
 
-        if st.button("➕ Lägg till ny orderrad"):
-            nuvarande_order["rader"].append({
-                "Recept": recept_lista_sorterad[0] if recept_lista_sorterad else "",
-                "Toppings_dict": {},
-                "Satser": 1.0,
-                "Bakade": 10,
-                "Sålda": 10,
-                "Pris_st": 15.0
-            })
-            st.rerun()
+        col_add, col_save_ord = st.columns([1, 1])
+        with col_add:
+            if st.button("➕ Lägg till ny orderrad"):
+                nuvarande_order["rader"].append({
+                    "Recept": recept_lista_sorterad[0] if recept_lista_sorterad else "",
+                    "Toppings_dict": {},
+                    "Satser": 1.0,
+                    "Bakade": 10,
+                    "Sålda": 10,
+                    "Pris_st": 15.0
+                })
+                spara_allt()
+                st.rerun()
+        with col_save_ord:
+            if st.button("💾 Spara Orderändringar", type="primary"):
+                spara_allt()
+                st.success("Order sparades permanent!")
 
     # Beräkningar & Tabellvisning för Orderbyggare
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
