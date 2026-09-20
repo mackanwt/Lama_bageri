@@ -256,5 +256,11 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
+    },
+    {
+        "Ingrediens": "sirap (kg)",
+        "Pris": 23.33,
+        "Enhet": "kg",
+        "Kalorier": 3200
     }
 ]
