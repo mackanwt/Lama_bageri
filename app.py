@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import json
 import base64
+import re
 
 st.set_page_config(page_title="Lama Bageri", page_icon="🦙", layout="wide", initial_sidebar_state="collapsed")
 
@@ -62,6 +63,7 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "")
 
 FILE_INGREDIENSER = "ingredienser.json"
 FILE_RECEPT = "recept.json"
+FILE_ORDERS = "orders.json"
 
 # ==========================================
 # DEFAULT DATA (OM GITHUB MISSLYCKAS)
@@ -122,32 +124,32 @@ DEFAULT_RECEPT = [
     {"namn": "Cinnamon loaf", "override_kostnad": 45.27, "override_kcal": 820, "ingredienser": []}
 ]
 
-DEFAULT_ORDERS = {
-    "Order 11-morfar": {
+DEFAULT_ORDERS = [
+    {
+        "order_id": "Order 11-morfar",
         "datum": "2026-06-13",
         "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0},
-            {"Recept": "Biskvier", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 17, "Sålda": 17, "Pris_st": 20.0},
-            {"Recept": "Oat cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 150, "Satser": 1.0, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0}
+            {"Recept": "Muffins", "Satser": 1.0, "Bakade": 21, "Sålda": 18, "Pris_st": 15.0, "Toppings_dict": {"Blåbär (kg)": 175.0}},
+            {"Recept": "Biskvier", "Satser": 1.0, "Bakade": 17, "Sålda": 17, "Pris_st": 20.0, "Toppings_dict": {}},
+            {"Recept": "Oat cookie", "Satser": 1.0, "Bakade": 24, "Sålda": 24, "Pris_st": 15.0, "Toppings_dict": {"Chokladknappar (kg)": 150.0}}
         ]
     },
-    "Order 7-Eivor": {
+    {
+        "order_id": "Order 7-Eivor",
         "datum": "2026-04-29/2026-05-15",
         "rader": [
-            {"Recept": "Muffins", "Topping": "Blåbär (kg)", "Mängd_g": 175, "Satser": 1.0, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0},
-            {"Recept": "Cookie", "Topping": "Chokladknappar (kg)", "Mängd_g": 100, "Satser": 1.0, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0},
-            {"Recept": "Kanelbullar", "Topping": "Ingen", "Mängd_g": 0, "Satser": 1.0, "Bakade": 38, "Sålda": 36, "Pris_st": 10.0}
+            {"Recept": "Muffins", "Satser": 1.0, "Bakade": 19, "Sålda": 17, "Pris_st": 15.0, "Toppings_dict": {"Blåbär (kg)": 175.0}},
+            {"Recept": "Cookie", "Satser": 1.0, "Bakade": 27, "Sålda": 25, "Pris_st": 10.0, "Toppings_dict": {"Chokladknappar (kg)": 100.0}},
+            {"Recept": "Kanelbullar", "Satser": 1.0, "Bakade": 38, "Sålda": 36, "Pris_st": 10.0, "Toppings_dict": {}}
         ]
     }
-}
+]
 
-# Hjälpfunktioner för GitHub-inläsning och sparning
 def load_file_from_github(file_path, default_data):
     if not GITHUB_TOKEN or not GITHUB_REPO:
         return default_data
     
-    # Läger till ?ref=main för att garantera att koden kollar i rätt gren
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}?ref=main"
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     
     try:
@@ -159,7 +161,7 @@ def load_file_from_github(file_path, default_data):
         else:
             st.warning(f"Kunde inte hämta {file_path} från GitHub (Status: {res.status_code}). Använder standarddata.")
     except json.JSONDecodeError as e:
-        st.error(f"⚠️ **Formatfel i {file_path}!** Ändra kommatecken till punkt vid decimaler på rad {e.lineno}.")
+        st.error(f"⚠️ **Syntaxfel i {file_path} på GitHub!** Checka kommatecken/citattecken på rad {e.lineno}.")
     except Exception as e:
         st.error(f"Ett fel uppstod vid inläsning av {file_path}: {e}")
 
@@ -174,7 +176,7 @@ def save_file_to_github(file_path, data_to_save):
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
 
     sha = None
-    res_get = requests.get(url + "?ref=main", headers=headers)
+    res_get = requests.get(url, headers=headers)
     if res_get.status_code == 200:
         sha = res_get.json()["sha"]
 
@@ -183,8 +185,7 @@ def save_file_to_github(file_path, data_to_save):
 
     payload = {
         "message": f"Uppdaterade {file_path} [via Streamlit]",
-        "content": encoded_content,
-        "branch": "main"
+        "content": encoded_content
     }
     if sha:
         payload["sha"] = sha
@@ -200,11 +201,11 @@ if "ingredienser" not in st.session_state:
 if "recept" not in st.session_state:
     st.session_state.recept = load_file_from_github(FILE_RECEPT, DEFAULT_RECEPT)
 
+if "orders_db" not in st.session_state:
+    st.session_state.orders_db = load_file_from_github(FILE_ORDERS, DEFAULT_ORDERS)
+
 if "toppings_lista" not in st.session_state:
     st.session_state.toppings_lista = DEFAULT_TOPPINGS
-
-if "orders_db" not in st.session_state:
-    st.session_state.orders_db = DEFAULT_ORDERS
 
 if "aktiv_recept_vy" not in st.session_state:
     st.session_state.aktiv_recept_vy = None
@@ -223,7 +224,8 @@ def berakna_recept_totalt(r_namn):
         ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
         for item in ing_lista:
             ing_namn = item.get("Ingrediens")
-            mängd = float(item.get("Mängd", 0))
+            raw_m = item.get("Mängd")
+            mängd = float(raw_m) if raw_m is not None else 0.0
             if ing_namn in ing_map:
                 info = ing_map[ing_namn]
                 enhet = info.get("Enhet", "kg")
@@ -247,13 +249,11 @@ except Exception:
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare", "📈 Årssammanställning"])
 
 # ------------------------------------------
-# ------------------------------------------
 # Flik 1: Ingredienser
 # ------------------------------------------
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
 
-    # Sortera automatiskt på ingrediensnamn A-Ö
     df_ing = pd.DataFrame(st.session_state.ingredienser)
     if not df_ing.empty and "Ingrediens" in df_ing.columns:
         df_ing = df_ing[GILTIGA_KOLUMNER].sort_values(by="Ingrediens", key=lambda col: col.str.lower())
@@ -387,7 +387,6 @@ with tab3:
             if st.button("💾 Spara Recept", use_container_width=True, type="primary"):
                 nytt_namn = recept_namn_input.strip()
                 if nytt_namn:
-                    # Ta bort gammalt om namnet redigerats
                     st.session_state.recept = [r for r in st.session_state.recept if r.get("namn") != r_namn_aktiv]
                     
                     st.session_state.recept.append({
@@ -437,24 +436,24 @@ with tab3:
                 st.session_state.recept = [r for r in st.session_state.recept if r.get("namn") != recept_lista_ta_bort]
                 save_file_to_github(FILE_RECEPT, st.session_state.recept)
                 st.rerun()
-                
+
 # ------------------------------------------
 # Flik 4: Orderbyggare
 # ------------------------------------------
 with tab4:
     st.subheader("🛒 Orderbyggare")
     
-    valj_order_nycklar = list(st.session_state.orders_db.keys())
+    valj_order_nycklar = [o["order_id"] for o in st.session_state.orders_db]
     
     c_sel_ord, c_btn_ord = st.columns([3, 1])
     with c_sel_ord:
-        valj_order = st.selectbox(
+        valj_order_id = st.selectbox(
             "📋 Välj order att granska eller redigera:", 
             valj_order_nycklar,
-            format_func=lambda x: f"{x} ({st.session_state.orders_db[x]['datum']})"
+            format_func=lambda x: f"{x} ({next((o['datum'] for o in st.session_state.orders_db if o['order_id'] == x), '')})"
         )
     with c_btn_ord:
-        st.write("") # Marginaljustering
+        st.write("")
         st.write("")
         skapa_ny_ord_klick = st.button("➕ Skapa ny order", use_container_width=True)
 
@@ -474,12 +473,14 @@ with tab4:
             
             if spara_form:
                 if nytt_order_namn.strip():
-                    st.session_state.orders_db[nytt_order_namn.strip()] = {
+                    st.session_state.orders_db.append({
+                        "order_id": nytt_order_namn.strip(),
                         "datum": nytt_order_datum.strip(),
                         "rader": []
-                    }
+                    })
+                    save_file_to_github(FILE_ORDERS, st.session_state.orders_db)
                     st.session_state.visa_ny_order_form = False
-                    st.success(f"Order '{nytt_order_namn}' skapad!")
+                    st.success(f"Order '{nytt_order_namn}' skapad och sparad till orders.json!")
                     st.rerun()
                 else:
                     st.error("Ange ett ordernamn!")
@@ -487,9 +488,9 @@ with tab4:
                 st.session_state.visa_ny_order_form = False
                 st.rerun()
 
-    nuvarande_order = st.session_state.orders_db.get(valj_order)
+    nuvarande_order = next((o for o in st.session_state.orders_db if o["order_id"] == valj_order_id), None)
     if nuvarande_order:
-        st.markdown(f"### {valj_order}")
+        st.markdown(f"### {nuvarande_order['order_id']}")
         st.caption(f"Datum: {nuvarande_order['datum']}")
 
         with st.expander("✏️ Redigera orderrader & toppings", expanded=True):
@@ -504,25 +505,22 @@ with tab4:
                 idx_recept = recept_lista_sorterad.index(nuvarande_recept) if nuvarande_recept in recept_lista_sorterad else 0
                 
                 with c1:
-                    r["Recept"] = st.selectbox("Recept", recept_lista_sorterad, index=idx_recept, key=f"rec_{valj_order}_{idx}")
+                    r["Recept"] = st.selectbox("Recept", recept_lista_sorterad, index=idx_recept, key=f"rec_{valj_order_id}_{idx}")
                 with c2:
-                    r["Satser"] = st.number_input("Satser", min_value=0.1, value=float(r.get("Satser", 1.0)), step=0.1, key=f"sat_{valj_order}_{idx}")
+                    r["Satser"] = st.number_input("Satser", min_value=0.1, value=float(r.get("Satser", 1.0)), step=0.1, key=f"sat_{valj_order_id}_{idx}")
                 with c3:
-                    r["Bakade"] = st.number_input("Bakade (st)", min_value=1, value=int(r.get("Bakade", 1)), key=f"bak_{valj_order}_{idx}")
+                    r["Bakade"] = st.number_input("Bakade (st)", min_value=1, value=int(r.get("Bakade", 1)), key=f"bak_{valj_order_id}_{idx}")
                 with c4:
-                    r["Sålda"] = st.number_input("Sålda (st)", min_value=0, value=int(r.get("Sålda", 0)), key=f"sal_{valj_order}_{idx}")
+                    r["Sålda"] = st.number_input("Sålda (st)", min_value=0, value=int(r.get("Sålda", 0)), key=f"sal_{valj_order_id}_{idx}")
                 with c5:
-                    r["Pris_st"] = st.number_input("Pris/st (kr)", min_value=0.0, value=float(r.get("Pris_st", 0.0)), step=0.5, key=f"prs_{valj_order}_{idx}")
+                    r["Pris_st"] = st.number_input("Pris/st (kr)", min_value=0.0, value=float(r.get("Pris_st", 0.0)), step=0.5, key=f"prs_{valj_order_id}_{idx}")
 
                 existerande_toppings = r.get("Toppings_dict", {})
-                if not existerande_toppings and r.get("Topping") and r.get("Topping") != "Ingen":
-                    existerande_toppings = {r["Topping"]: r.get("Mängd_g", 0)}
-
                 valda_toppings = st.multiselect(
                     "Välj Toppings:",
                     options=sorted(st.session_state.toppings_lista),
                     default=list(existerande_toppings.keys()),
-                    key=f"top_multi_{valj_order}_{idx}"
+                    key=f"top_multi_{valj_order_id}_{idx}"
                 )
 
                 nya_toppings_dict = {}
@@ -536,18 +534,19 @@ with tab4:
                                 min_value=0.0,
                                 value=start_mängd,
                                 step=5.0,
-                                key=f"mngd_{valj_order}_{idx}_{t_namn}"
+                                key=f"mngd_{valj_order_id}_{idx}_{t_namn}"
                             )
                 
                 r["Toppings_dict"] = nya_toppings_dict
                 
-                if st.button("🗑️ Ta bort rad", key=f"del_row_{valj_order}_{idx}"):
+                if st.button("🗑️ Ta bort rad", key=f"del_row_{valj_order_id}_{idx}"):
                     rader_ta_bort.append(idx)
                 st.markdown("---")
 
             if rader_ta_bort:
                 for index in sorted(rader_ta_bort, reverse=True):
                     nuvarande_order["rader"].pop(index)
+                save_file_to_github(FILE_ORDERS, st.session_state.orders_db)
                 st.rerun()
 
             col_add, col_save_ord = st.columns([1, 1])
@@ -561,10 +560,12 @@ with tab4:
                         "Sålda": 10,
                         "Pris_st": 15.0
                     })
+                    save_file_to_github(FILE_ORDERS, st.session_state.orders_db)
                     st.rerun()
             with col_save_ord:
                 if st.button("💾 Spara Orderändringar", type="primary"):
-                    st.success("Orderändringar har sparats i sessionen!")
+                    save_file_to_github(FILE_ORDERS, st.session_state.orders_db)
+                    st.success("Orderändringar sparades permanent till orders.json!")
 
         # Kalkyleringar & Tabellvisning för Orderbyggare
         ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
@@ -729,12 +730,9 @@ with tab4:
 with tab5:
     st.subheader("📈 Årssammanställning över alla ordrar")
     
-    # Hämta unika år från orderdatumen
     alla_ar = set()
-    for o_key, o_val in st.session_state.orders_db.items():
-        datum_str = o_val.get("datum", "")
-        # Extrahera 4 siffror för år
-        import re
+    for ord_obj in st.session_state.orders_db:
+        datum_str = ord_obj.get("datum", "")
         ar_match = re.search(r'\b(20\d{2})\b', datum_str)
         if ar_match:
             alla_ar.add(ar_match.group(1))
@@ -751,14 +749,14 @@ with tab5:
     tot_ar_vinst = 0.0
     tot_ar_kostnad = 0.0
 
-    for ord_id, ord_data in st.session_state.orders_db.items():
-        datum_str = ord_data.get("datum", "")
+    for ord_obj in st.session_state.orders_db:
+        datum_str = ord_obj.get("datum", "")
         if valjt_ar in datum_str:
             ord_salda = 0
             ord_intakt = 0.0
             ord_kostnad = 0.0
 
-            for r in ord_data.get("rader", []):
+            for r in ord_obj.get("rader", []):
                 rec_k, _ = berakna_recept_totalt(r.get("Recept", ""))
                 
                 top_k_tot = 0.0
@@ -789,7 +787,7 @@ with tab5:
             tot_ar_vinst += ord_vinst
 
             ar_ordrar_rader.append({
-                "Order": ord_id,
+                "Order": ord_obj.get("order_id", ""),
                 "Datum": datum_str,
                 "Sålda Kakor": f"{ord_salda} st",
                 "Totalkostnad": f"{round(ord_kostnad)} kr",
@@ -797,7 +795,6 @@ with tab5:
                 "Vinst": f"{round(ord_vinst)} kr"
             })
 
-    # Topp-nyckeltal
     m1, m2, m3 = st.columns(3)
     m1.metric("Totalt sålda kakor", f"{tot_ar_salda} st")
     m2.metric("Total Omsättning", f"{round(tot_ar_intakt)} kr")
