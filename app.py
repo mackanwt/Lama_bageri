@@ -146,7 +146,8 @@ def load_file_from_github(file_path, default_data):
     if not GITHUB_TOKEN or not GITHUB_REPO:
         return default_data
     
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+    # Läger till ?ref=main för att garantera att koden kollar i rätt gren
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}?ref=main"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     
     try:
@@ -158,7 +159,7 @@ def load_file_from_github(file_path, default_data):
         else:
             st.warning(f"Kunde inte hämta {file_path} från GitHub (Status: {res.status_code}). Använder standarddata.")
     except json.JSONDecodeError as e:
-        st.error(f"⚠️ **Syntaxfel i {file_path} på GitHub!**\n\nKunde inte läsa filen. Kontrollera kommatecken och citattecken på rad {e.lineno}. Detaljer: {e}")
+        st.error(f"⚠️ **Formatfel i {file_path}!** Ändra kommatecken till punkt vid decimaler på rad {e.lineno}.")
     except Exception as e:
         st.error(f"Ett fel uppstod vid inläsning av {file_path}: {e}")
 
@@ -173,7 +174,7 @@ def save_file_to_github(file_path, data_to_save):
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
 
     sha = None
-    res_get = requests.get(url, headers=headers)
+    res_get = requests.get(url + "?ref=main", headers=headers)
     if res_get.status_code == 200:
         sha = res_get.json()["sha"]
 
@@ -182,7 +183,8 @@ def save_file_to_github(file_path, data_to_save):
 
     payload = {
         "message": f"Uppdaterade {file_path} [via Streamlit]",
-        "content": encoded_content
+        "content": encoded_content,
+        "branch": "main"
     }
     if sha:
         payload["sha"] = sha
