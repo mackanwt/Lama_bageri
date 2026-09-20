@@ -106,6 +106,14 @@
         "datum": "2026-09-17",
         "rader": [
             {
+                "Recept": "Linfröfrallor",
+                "Toppings_dict": {},
+                "Satser": 1.0,
+                "Bakade": 25,
+                "Sålda": 24,
+                "Pris_st": 6.0
+            },
+            {
                 "Recept": "Bagels",
                 "Toppings_dict": {},
                 "Satser": 1.0,
