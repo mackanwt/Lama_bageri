@@ -20,11 +20,15 @@
     {"Ingrediens": "Kanel (kg)", "Pris": 587.50, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Kokosflingor (kg)", "Pris": 114.80, "Enhet": "kg", "Kalorier": 6600},
     {"Ingrediens": "Mandel (kg)", "Pris": 330.00, "Enhet": "kg", "Kalorier": 6000},
-    {"Ingrediens": "Mjöl (kg)", "Pris": 7.20, "Enhet": "kg", "Kalorier": 3500},
+    {"Ingrediens": "Vetejöl (kg)", "Pris": 7.20, "Enhet": "kg", "Kalorier": 3500},
+    {"Ingrediens": "Vetejöl Special (kg)", "Pris": 11.33, "Enhet": "kg", "Kalorier": 3500},
+    {"Ingrediens": "Vetejöl Special Fullkorn (kg)", "Pris": 14.91, "Enhet": "kg", "Kalorier": 3500},
+    {"Ingrediens": "Dinkelmjöl (kg)", "Pris": 26,02, "Enhet": "kg", "Kalorier": 3500},
     {"Ingrediens": "Mjölk (kg)", "Pris": 10.90, "Enhet": "kg", "Kalorier": 450},
     {"Ingrediens": "Morot (kg)", "Pris": 13.95, "Enhet": "kg", "Kalorier": 400},
     {"Ingrediens": "Nejlika (kg)", "Pris": 630.00, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Olja (kg)", "Pris": 28.24, "Enhet": "kg", "Kalorier": 8800},
+    {"Ingrediens": "Olivolja (kg)", "Pris": 96.42, "Enhet": "kg", "Kalorier": 9200},
     {"Ingrediens": "Rågsikt (kg)", "Pris": 9.45, "Enhet": "kg", "Kalorier": 3400},
     {"Ingrediens": "Salt (kg)", "Pris": 11.50, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Sesamfrön (kg)", "Pris": 97.33, "Enhet": "kg", "Kalorier": 5700},
@@ -35,5 +39,7 @@
     {"Ingrediens": "Vaniljextrakt (kg)", "Pris": 1199.00, "Enhet": "kg", "Kalorier": 0},
     {"Ingrediens": "Vaniljsocker (kg)", "Pris": 115.00, "Enhet": "kg", "Kalorier": 4000},
     {"Ingrediens": "Vispgrädde (kg)", "Pris": 74.00, "Enhet": "kg", "Kalorier": 3500},
-    {"Ingrediens": "Yoghurt (kg)", "Pris": 28.50, "Enhet": "kg", "Kalorier": 600}
+    {"Ingrediens": "Yoghurt (kg)", "Pris": 28.50, "Enhet": "kg", "Kalorier": 600},
+    {"Ingrediens": "Linfrön (kg)", "Pris": 32.13, "Enhet": "kg", "Kalorier": 5300},
+    {"Ingrediens": "Solroskärnor (kg)", "Pris": 52.03, "Enhet": "kg", "Kalorier": 5900}
 ]
