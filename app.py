@@ -367,10 +367,10 @@ with tab3:
         live_kcal = 0
         rader_dict = edited_rec_ing.to_dict(orient="records")
         
-       for item in rader_dict:
-    i_namn = item.get("Ingrediens")
-    raw_mängd = item.get("Mängd")
-    mängd = float(raw_mängd) if raw_mängd is not None else 0.0
+        for item in rader_dict:
+            i_namn = item.get("Ingrediens")
+            raw_mängd = item.get("Mängd")
+            mängd = float(raw_mängd) if raw_mängd is not None else 0.0
             if i_namn in ing_map:
                 info = ing_map[i_namn]
                 enhet = info.get("Enhet", "kg")
@@ -437,7 +437,7 @@ with tab3:
                 st.session_state.recept = [r for r in st.session_state.recept if r.get("namn") != recept_lista_ta_bort]
                 save_file_to_github(FILE_RECEPT, st.session_state.recept)
                 st.rerun()
-
+                
 # ------------------------------------------
 # Flik 4: Orderbyggare
 # ------------------------------------------
