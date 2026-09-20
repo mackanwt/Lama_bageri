@@ -112,5 +112,36 @@
         ],
         "override_kostnad": 39.306650000000005,
         "override_kcal": 4768
+    },
+    {
+        "namn": "Fullkornsbröd",
+        "ingredienser": [
+            {
+                "Ingrediens": "Olivolja (kg)",
+                "Mängd": 100.0
+            },
+            {
+                "Ingrediens": "Mjöl Vete Special Fullkorn (kg)",
+                "Mängd": 250.0
+            },
+            {
+                "Ingrediens": "Mjöl Dinkel (kg)",
+                "Mängd": 250.0
+            },
+            {
+                "Ingrediens": "Socker (kg)",
+                "Mängd": 14.0
+            },
+            {
+                "Ingrediens": "Salt (kg)",
+                "Mängd": 5.0
+            },
+            {
+                "Ingrediens": "Jäst (kg)",
+                "Mängd": 10.0
+            }
+        ],
+        "override_kostnad": 23.303,
+        "override_kcal": 2736
     }
 ]
