@@ -445,11 +445,15 @@ with tab4:
     
     valj_order_nycklar = [o["order_id"] for o in st.session_state.orders_db]
     
+    # Sätt index till den sista (senaste) ordern i listan som standard
+    senaste_index = len(valj_order_nycklar) - 1 if valj_order_nycklar else 0
+    
     c_sel_ord, c_btn_ord = st.columns([3, 1])
     with c_sel_ord:
         valj_order_id = st.selectbox(
             "📋 Välj order att granska eller redigera:", 
             valj_order_nycklar,
+            index=senaste_index,
             format_func=lambda x: f"{x} ({next((o['datum'] for o in st.session_state.orders_db if o['order_id'] == x), '')})"
         )
     with c_btn_ord:
@@ -493,7 +497,8 @@ with tab4:
         st.markdown(f"### {nuvarande_order['order_id']}")
         st.caption(f"Datum: {nuvarande_order['datum']}")
 
-        with st.expander("✏️ Redigera orderrader & toppings", expanded=True):
+        # Ändrat till expanded=False för att vara stängd by default
+        with st.expander("✏️ Redigera orderrader & toppings", expanded=False):
             rader_ta_bort = []
             recept_lista_sorterad = sorted([r.get("namn") for r in st.session_state.recept])
             
