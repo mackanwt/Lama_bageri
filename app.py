@@ -367,9 +367,10 @@ with tab3:
         live_kcal = 0
         rader_dict = edited_rec_ing.to_dict(orient="records")
         
-        for item in rader_dict:
-            i_namn = item.get("Ingrediens")
-            mängd = float(item.get("Mängd", 0))
+       for item in rader_dict:
+    i_namn = item.get("Ingrediens")
+    raw_mängd = item.get("Mängd")
+    mängd = float(raw_mängd) if raw_mängd is not None else 0.0
             if i_namn in ing_map:
                 info = ing_map[i_namn]
                 enhet = info.get("Enhet", "kg")
