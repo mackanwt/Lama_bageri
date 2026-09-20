@@ -92,12 +92,12 @@
                 "Pris_st": 10.0
             },
             {
-                "Recept": "Bagels",
+                "Recept": "Kanelbullar",
                 "Toppings_dict": {},
                 "Satser": 1.0,
-                "Bakade": 10,
-                "Sålda": 10,
-                "Pris_st": 15.0
+                "Bakade": 28,
+                "Sålda": 24,
+                "Pris_st": 10.0
             }
         ]
     }
