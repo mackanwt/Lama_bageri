@@ -59,10 +59,12 @@ st.markdown("""
 # ==========================================
 GITHUB_TOKEN = st.secrets.get("GITHUB_TOKEN", "")
 GITHUB_REPO = st.secrets.get("GITHUB_REPO", "")
-FILE_PATH = "bageri_data.json"
+
+FILE_INGREDIENSER = "ingredienser.json"
+FILE_RECEPT = "recept.json"
 
 # ==========================================
-# DEFAULT DATA
+# DEFAULT DATA (OM GITHUB MISSLYCKAS)
 # ==========================================
 DEFAULT_INGREDIENSER = [
     {"Ingrediens": "Apelsin (st)", "Pris": 6.37, "Enhet": "st", "Kalorier": 40},
@@ -106,19 +108,19 @@ DEFAULT_INGREDIENSER = [
 
 DEFAULT_TOPPINGS = ["Blåbär (kg)", "Chokladknappar (kg)", "Kokosflingor (kg)", "Valnötter (kg)", "Sesamfrön (kg)", "Vallmofrön (kg)"]
 
-DEFAULT_RECEPT = {
-    "Muffins": {"override_kostnad": 51.05, "override_kcal": 4650, "ingredienser": [{"Ingrediens": "Mjöl (kg)", "Mängd": 300}, {"Ingrediens": "Socker (kg)", "Mängd": 200}, {"Ingrediens": "Egg (st)", "Mängd": 2}]},
-    "Biskvier": {"override_kostnad": 96.19, "override_kcal": 3350, "ingredienser": []},
-    "Oat cookie": {"override_kostnad": 65.87, "override_kcal": 4100, "ingredienser": []},
-    "Brownie": {"override_kostnad": 78.32, "override_kcal": 3850, "ingredienser": []},
-    "Cookie": {"override_kostnad": 40.22, "override_kcal": 3200, "ingredienser": []},
-    "Bagels": {"override_kostnad": 21.06, "override_kcal": 2850, "ingredienser": []},
-    "Morotskaka": {"override_kostnad": 69.86, "override_kcal": 4400, "ingredienser": []},
-    "Chokladkaka": {"override_kostnad": 143.69, "override_kcal": 9800, "ingredienser": []},
-    "Kanelbullar": {"override_kostnad": 69.26, "override_kcal": 5450, "ingredienser": []},
-    "Orange cake": {"override_kostnad": 48.23, "override_kcal": 820, "ingredienser": []},
-    "Cinnamon loaf": {"override_kostnad": 45.27, "override_kcal": 820, "ingredienser": []}
-}
+DEFAULT_RECEPT = [
+    {"namn": "Muffins", "override_kostnad": 51.05, "override_kcal": 4650, "ingredienser": [{"Ingrediens": "Mjöl (kg)", "Mängd": 300}, {"Ingrediens": "Socker (kg)", "Mängd": 200}, {"Ingrediens": "Egg (st)", "Mängd": 2}]},
+    {"namn": "Biskvier", "override_kostnad": 96.19, "override_kcal": 3350, "ingredienser": []},
+    {"namn": "Oat cookie", "override_kostnad": 65.87, "override_kcal": 4100, "ingredienser": []},
+    {"namn": "Brownie", "override_kostnad": 78.32, "override_kcal": 3850, "ingredienser": []},
+    {"namn": "Cookie", "override_kostnad": 40.22, "override_kcal": 3200, "ingredienser": []},
+    {"namn": "Bagels", "override_kostnad": 21.06, "override_kcal": 2850, "ingredienser": []},
+    {"namn": "Morotskaka", "override_kostnad": 69.86, "override_kcal": 4400, "ingredienser": []},
+    {"namn": "Chokladkaka", "override_kostnad": 143.69, "override_kcal": 9800, "ingredienser": []},
+    {"namn": "Kanelbullar", "override_kostnad": 69.26, "override_kcal": 5450, "ingredienser": []},
+    {"namn": "Orange cake", "override_kostnad": 48.23, "override_kcal": 820, "ingredienser": []},
+    {"namn": "Cinnamon loaf", "override_kostnad": 45.27, "override_kcal": 820, "ingredienser": []}
+]
 
 DEFAULT_ORDERS = {
     "Order 11-morfar": {
@@ -139,18 +141,12 @@ DEFAULT_ORDERS = {
     }
 }
 
-ALL_DEFAULT_DATA = {
-    "ingredienser": DEFAULT_INGREDIENSER,
-    "toppings_lista": DEFAULT_TOPPINGS,
-    "recept": DEFAULT_RECEPT,
-    "orders_db": DEFAULT_ORDERS
-}
-
-def load_data_from_github():
+# Hjälpfunktioner för GitHub-inläsning och sparning
+def load_file_from_github(file_path, default_data):
     if not GITHUB_TOKEN or not GITHUB_REPO:
-        return ALL_DEFAULT_DATA
+        return default_data
     
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
     
     try:
@@ -158,19 +154,18 @@ def load_data_from_github():
         if res.status_code == 200:
             content = res.json()["content"]
             decoded_data = base64.b64decode(content).decode('utf-8')
-            loaded = json.loads(decoded_data)
-            return loaded
+            return json.loads(decoded_data)
     except Exception:
         pass
 
-    return ALL_DEFAULT_DATA
+    return default_data
 
-def save_data_to_github(data_dict):
+def save_file_to_github(file_path, data_to_save):
     if not GITHUB_TOKEN or not GITHUB_REPO:
         st.warning("GITHUB_TOKEN eller GITHUB_REPO saknas i Secrets.")
         return
 
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
     headers = {"Authorization": f"token {GITHUB_TOKEN}"}
 
     sha = None
@@ -178,11 +173,11 @@ def save_data_to_github(data_dict):
     if res_get.status_code == 200:
         sha = res_get.json()["sha"]
 
-    json_str = json.dumps(data_dict, indent=4, ensure_ascii=False)
+    json_str = json.dumps(data_to_save, indent=4, ensure_ascii=False)
     encoded_content = base64.b64encode(json_str.encode('utf-8')).decode('utf-8')
 
     payload = {
-        "message": "Uppdaterade bageridata [via Streamlit]",
+        "message": f"Uppdaterade {file_path} [via Streamlit]",
         "content": encoded_content
     }
     if sha:
@@ -190,18 +185,20 @@ def save_data_to_github(data_dict):
 
     res_put = requests.put(url, headers=headers, json=payload)
     if res_put.status_code not in [200, 201]:
-        st.error(f"Kunde inte spara till GitHub: {res_put.text}")
+        st.error(f"Kunde inte spara {file_path} till GitHub: {res_put.text}")
 
 # Ladda data från GitHub vid start
-if "bageri_data" not in st.session_state:
-    st.session_state.bageri_data = load_data_from_github()
+if "ingredienser" not in st.session_state:
+    st.session_state.ingredienser = load_file_from_github(FILE_INGREDIENSER, DEFAULT_INGREDIENSER)
 
-# Synkronisera Session State
-bageri_data = st.session_state.bageri_data
-st.session_state.ingredienser = bageri_data.get("ingredienser", DEFAULT_INGREDIENSER)
-st.session_state.toppings_lista = bageri_data.get("toppings_lista", DEFAULT_TOPPINGS)
-st.session_state.recept = bageri_data.get("recept", DEFAULT_RECEPT)
-st.session_state.orders_db = bageri_data.get("orders_db", DEFAULT_ORDERS)
+if "recept" not in st.session_state:
+    st.session_state.recept = load_file_from_github(FILE_RECEPT, DEFAULT_RECEPT)
+
+if "toppings_lista" not in st.session_state:
+    st.session_state.toppings_lista = DEFAULT_TOPPINGS
+
+if "orders_db" not in st.session_state:
+    st.session_state.orders_db = DEFAULT_ORDERS
 
 if "aktiv_recept_vy" not in st.session_state:
     st.session_state.aktiv_recept_vy = None
@@ -209,9 +206,11 @@ if "aktiv_recept_vy" not in st.session_state:
 GILTIGA_KOLUMNER = ["Ingrediens", "Pris", "Enhet", "Kalorier"]
 
 def berakna_recept_totalt(r_namn):
-    r_data = st.session_state.recept.get(r_namn, {})
+    r_data = next((r for r in st.session_state.recept if r.get("namn") == r_namn), None)
+    if not r_data:
+        return 50.0, 4000
+
     ing_lista = r_data.get("ingredienser", [])
-    
     if ing_lista:
         tot_k = 0.0
         tot_kcal = 0
@@ -228,15 +227,6 @@ def berakna_recept_totalt(r_namn):
         return tot_k, tot_kcal
     else:
         return r_data.get("override_kostnad", 50.0), r_data.get("override_kcal", 4000)
-
-def spara_allt():
-    st.session_state.bageri_data = {
-        "ingredienser": st.session_state.ingredienser,
-        "toppings_lista": st.session_state.toppings_lista,
-        "recept": st.session_state.recept,
-        "orders_db": st.session_state.orders_db
-    }
-    save_data_to_github(st.session_state.bageri_data)
 
 # LOGGA HÖGST UPP
 try:
@@ -285,8 +275,8 @@ with tab1:
         )
         if st.button("💾 Spara ändringar i Ingredienser", type="primary"):
             st.session_state.ingredienser = edited_ing_df.to_dict(orient="records")
-            spara_allt()
-            st.success("Ingredienser sparades!")
+            save_file_to_github(FILE_INGREDIENSER, st.session_state.ingredienser)
+            st.success("Ingredienser sparades till ingredienser.json!")
             st.rerun()
 
 # ------------------------------------------
@@ -306,7 +296,6 @@ with tab2:
             if st.button("➕ Lägg till"):
                 if ny_topping and ny_topping not in st.session_state.toppings_lista:
                     st.session_state.toppings_lista.append(ny_topping)
-                    spara_allt()
                     st.success("Topping tillagd!")
                     st.rerun()
 
@@ -323,7 +312,6 @@ with tab2:
 
         if top_to_remove:
             st.session_state.toppings_lista.remove(top_to_remove)
-            spara_allt()
             st.success("Topping raderad!")
             st.rerun()
 
@@ -339,7 +327,7 @@ with tab3:
         
         st.markdown(f"### {'➕ Skapa Nytt Recept' if is_new else f'✏️ Redigera Recept: {r_namn_aktiv}'}")
         
-        nuvarande_data = st.session_state.recept.get(r_namn_aktiv, {"ingredienser": [], "override_kostnad": 0.0, "override_kcal": 0})
+        nuvarande_data = next((r for r in st.session_state.recept if r.get("namn") == r_namn_aktiv), {"namn": "", "ingredienser": [], "override_kostnad": 0.0, "override_kcal": 0})
         recept_namn_input = st.text_input("Receptnamn:", value="" if is_new else r_namn_aktiv)
         
         st.markdown("#### Ingredienser i receptet")
@@ -384,18 +372,20 @@ with tab3:
         c_spara, c_avbryt = st.columns([1, 1])
         with c_spara:
             if st.button("💾 Spara Recept", use_container_width=True, type="primary"):
-                if recept_namn_input.strip():
-                    if not is_new and recept_namn_input != r_namn_aktiv:
-                        del st.session_state.recept[r_namn_aktiv]
+                nytt_namn = recept_namn_input.strip()
+                if nytt_namn:
+                    # Ta bort gammalt om namnet redigerats
+                    st.session_state.recept = [r for r in st.session_state.recept if r.get("namn") != r_namn_aktiv]
                     
-                    st.session_state.recept[recept_namn_input.strip()] = {
+                    st.session_state.recept.append({
+                        "namn": nytt_namn,
                         "ingredienser": [r for r in rader_dict if r.get("Ingrediens")],
                         "override_kostnad": live_k,
                         "override_kcal": live_kcal
-                    }
-                    spara_allt()
+                    })
+                    save_file_to_github(FILE_RECEPT, st.session_state.recept)
                     st.session_state.aktiv_recept_vy = None
-                    st.success("Receptet sparades!")
+                    st.success("Receptet sparades till recept.json!")
                     st.rerun()
                 else:
                     st.error("Ange ett receptnamn!")
@@ -414,7 +404,8 @@ with tab3:
             st.markdown("---")
             
             recept_lista_ta_bort = None
-            for r_namn in sorted(list(st.session_state.recept.keys())):
+            for r_obj in sorted(st.session_state.recept, key=lambda x: x.get("namn", "")):
+                r_namn = r_obj.get("namn")
                 k, kcal = berakna_recept_totalt(r_namn)
                 col_r1, col_r2, col_r3, col_r4 = st.columns([4, 4, 1, 1])
                 with col_r1:
@@ -430,8 +421,8 @@ with tab3:
                         recept_lista_ta_bort = r_namn
 
             if recept_lista_ta_bort:
-                del st.session_state.recept[recept_lista_ta_bort]
-                spara_allt()
+                st.session_state.recept = [r for r in st.session_state.recept if r.get("namn") != recept_lista_ta_bort]
+                save_file_to_github(FILE_RECEPT, st.session_state.recept)
                 st.rerun()
 
 # ------------------------------------------
@@ -453,7 +444,7 @@ with tab4:
 
     with st.expander("✏️ Redigera orderrader & toppings", expanded=True):
         rader_ta_bort = []
-        recept_lista_sorterad = sorted(list(st.session_state.recept.keys()))
+        recept_lista_sorterad = sorted([r.get("namn") for r in st.session_state.recept])
         
         for idx, r in enumerate(nuvarande_order["rader"]):
             st.markdown(f"**Rad {idx+1}: {r.get('Recept', 'Recept')}**")
@@ -507,7 +498,6 @@ with tab4:
         if rader_ta_bort:
             for index in sorted(rader_ta_bort, reverse=True):
                 nuvarande_order["rader"].pop(index)
-            spara_allt()
             st.rerun()
 
         col_add, col_save_ord = st.columns([1, 1])
@@ -521,12 +511,10 @@ with tab4:
                     "Sålda": 10,
                     "Pris_st": 15.0
                 })
-                spara_allt()
                 st.rerun()
         with col_save_ord:
             if st.button("💾 Spara Orderändringar", type="primary"):
-                spara_allt()
-                st.success("Order sparades permanent!")
+                st.success("Order ändringar har sparats i sessionen!")
 
     # Beräkningar & Tabellvisning för Orderbyggare
     ing_map = {i["Ingrediens"]: i for i in st.session_state.ingredienser if "Ingrediens" in i}
