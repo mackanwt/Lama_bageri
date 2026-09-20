@@ -72,6 +72,16 @@
         "datum": "2026-09-17",
         "rader": [
             {
+                "Recept": "Cookie",
+                "Toppings_dict": {
+                    "Kokosflingor (kg)": 100.0
+                },
+                "Satser": 1.0,
+                "Bakade": 26,
+                "Sålda": 24,
+                "Pris_st": 10.0
+            },
+            {
                 "Recept": "Bagels",
                 "Toppings_dict": {},
                 "Satser": 1.0,
