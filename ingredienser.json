@@ -42,7 +42,7 @@
         "Kalorier": 5400
     },
     {
-        "Ingrediens": "Dinkelmjöl (kg)",
+        "Ingrediens": "Mjöl Dinkel (kg)",
         "Pris": 26.02,
         "Enhet": "kg",
         "Kalorier": 3500
@@ -70,12 +70,6 @@
         "Pris": 112.5,
         "Enhet": "kg",
         "Kalorier": 2500
-    },
-    {
-        "Ingrediens": "Mjöl Graham",
-        "Pris": 13.17,
-        "Enhet": "kg",
-        "Kalorier": 3500
     },
     {
         "Ingrediens": "Gräddfil (kg)",
@@ -142,6 +136,30 @@
         "Pris": 330.0,
         "Enhet": "kg",
         "Kalorier": 6000
+    },
+    {
+        "Ingrediens": "Mjöl Graham",
+        "Pris": 13.17,
+        "Enhet": "kg",
+        "Kalorier": 3500
+    },
+    {
+        "Ingrediens": "Mjöl Vete (kg)",
+        "Pris": 7.2,
+        "Enhet": "kg",
+        "Kalorier": 3500
+    },
+    {
+        "Ingrediens": "Mjöl Vete Special (kg)",
+        "Pris": 11.33,
+        "Enhet": "kg",
+        "Kalorier": 3500
+    },
+    {
+        "Ingrediens": "Mjöl Vete Special Fullkorn (kg)",
+        "Pris": 14.91,
+        "Enhet": "kg",
+        "Kalorier": 3500
     },
     {
         "Ingrediens": "Mjölk (kg)",
@@ -238,24 +256,6 @@
         "Pris": 115.0,
         "Enhet": "kg",
         "Kalorier": 4000
-    },
-    {
-        "Ingrediens": "Mjöl Vete (kg)",
-        "Pris": 7.2,
-        "Enhet": "kg",
-        "Kalorier": 3500
-    },
-    {
-        "Ingrediens": "Mjöl Vete Special (kg)",
-        "Pris": 11.33,
-        "Enhet": "kg",
-        "Kalorier": 3500
-    },
-    {
-        "Ingrediens": "Mjöl Vete Special Fullkorn (kg)",
-        "Pris": 14.91,
-        "Enhet": "kg",
-        "Kalorier": 3500
     },
     {
         "Ingrediens": "Vispgrädde (kg)",
