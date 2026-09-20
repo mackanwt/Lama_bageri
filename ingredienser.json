@@ -186,6 +186,12 @@
         "Kalorier": 5700
     },
     {
+        "Ingrediens": "Sirap (kg)",
+        "Pris": 23.33,
+        "Enhet": "kg",
+        "Kalorier": 3200
+    },
+    {
         "Ingrediens": "Smör (kg)",
         "Pris": 125.9,
         "Enhet": "kg",
@@ -256,11 +262,5 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
-    },
-    {
-        "Ingrediens": "sirap (kg)",
-        "Pris": 23.33,
-        "Enhet": "kg",
-        "Kalorier": 3200
     }
 ]
