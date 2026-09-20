@@ -82,6 +82,16 @@
                 "Pris_st": 10.0
             },
             {
+                "Recept": "Cookie",
+                "Toppings_dict": {
+                    "Chokladknappar (kg)": 150.0
+                },
+                "Satser": 1.0,
+                "Bakade": 25,
+                "Sålda": 25,
+                "Pris_st": 10.0
+            },
+            {
                 "Recept": "Bagels",
                 "Toppings_dict": {},
                 "Satser": 1.0,
