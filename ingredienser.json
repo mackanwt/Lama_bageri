@@ -262,5 +262,11 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
+    },
+    {
+        "Ingrediens": "Grahamsmjöl",
+        "Pris": 13.17,
+        "Enhet": "kg",
+        "Kalorier": 3500
     }
 ]
