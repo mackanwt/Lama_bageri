@@ -42,12 +42,6 @@
         "Kalorier": 5400
     },
     {
-        "Ingrediens": "Mjöl Dinkel (kg)",
-        "Pris": 26.02,
-        "Enhet": "kg",
-        "Kalorier": 3500
-    },
-    {
         "Ingrediens": "Egg (st)",
         "Pris": 1.9,
         "Enhet": "st",
@@ -138,7 +132,13 @@
         "Kalorier": 6000
     },
     {
-        "Ingrediens": "Mjöl Graham",
+        "Ingrediens": "Mjöl Dinkel (kg)",
+        "Pris": 26.02,
+        "Enhet": "kg",
+        "Kalorier": 3500
+    },
+    {
+        "Ingrediens": "Mjöl Graham (kg)",
         "Pris": 13.17,
         "Enhet": "kg",
         "Kalorier": 3500
