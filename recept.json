@@ -4,9 +4,18 @@
         "override_kostnad": 51.05,
         "override_kcal": 4650,
         "ingredienser": [
-            {"Ingrediens": "Mjöl (kg)", "Mängd": 300.0},
-            {"Ingrediens": "Socker (kg)", "Mängd": 200.0},
-            {"Ingrediens": "Egg (st)", "Mängd": 2.0}
+            {
+                "Ingrediens": "Mjöl (kg)",
+                "Mängd": 300.0
+            },
+            {
+                "Ingrediens": "Socker (kg)",
+                "Mängd": 200.0
+            },
+            {
+                "Ingrediens": "Egg (st)",
+                "Mängd": 2.0
+            }
         ]
     },
     {
@@ -68,5 +77,40 @@
         "override_kostnad": 45.27,
         "override_kcal": 820,
         "ingredienser": []
+    },
+    {
+        "namn": "Linfröfrallor",
+        "ingredienser": [
+            {
+                "Ingrediens": "Smör (kg)",
+                "Mängd": 50.0
+            },
+            {
+                "Ingrediens": "Mjöl Vete Special (kg)",
+                "Mängd": 725.0
+            },
+            {
+                "Ingrediens": "Mjöl Graham (kg)",
+                "Mängd": 250.0
+            },
+            {
+                "Ingrediens": "Sirap (kg)",
+                "Mängd": 130.0
+            },
+            {
+                "Ingrediens": "Salt (kg)",
+                "Mängd": 7.0
+            },
+            {
+                "Ingrediens": "Jäst (kg)",
+                "Mängd": 50.0
+            },
+            {
+                "Ingrediens": "Linfrön (kg)",
+                "Mängd": 100.0
+            }
+        ],
+        "override_kostnad": 39.306650000000005,
+        "override_kcal": 4768
     }
 ]
