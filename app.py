@@ -155,8 +155,12 @@ def load_file_from_github(file_path, default_data):
             content = res.json()["content"]
             decoded_data = base64.b64decode(content).decode('utf-8')
             return json.loads(decoded_data)
-    except Exception:
-        pass
+        else:
+            st.warning(f"Kunde inte hämta {file_path} från GitHub (Status: {res.status_code}). Använder standarddata.")
+    except json.JSONDecodeError as e:
+        st.error(f"⚠️ **Syntaxfel i {file_path} på GitHub!**\n\nKunde inte läsa filen. Kontrollera kommatecken och citattecken på rad {e.lineno}. Detaljer: {e}")
+    except Exception as e:
+        st.error(f"Ett fel uppstod vid inläsning av {file_path}: {e}")
 
     return default_data
 
@@ -241,12 +245,18 @@ except Exception:
 tab1, tab2, tab3, tab4 = st.tabs(["🥦 Ingredienser", "🍓 Toppings", "📖 Recept", "🛒 Orderbyggare"])
 
 # ------------------------------------------
+# ------------------------------------------
 # Flik 1: Ingredienser
 # ------------------------------------------
 with tab1:
     st.subheader("🥦 Ingrediensbibliotek")
 
-    df_ing = pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER]
+    # Sortera automatiskt på ingrediensnamn A-Ö
+    df_ing = pd.DataFrame(st.session_state.ingredienser)
+    if not df_ing.empty and "Ingrediens" in df_ing.columns:
+        df_ing = df_ing[GILTIGA_KOLUMNER].sort_values(by="Ingrediens", key=lambda col: col.str.lower())
+    else:
+        df_ing = pd.DataFrame(columns=GILTIGA_KOLUMNER)
 
     st.dataframe(
         df_ing,
@@ -262,7 +272,7 @@ with tab1:
 
     with st.expander("➕ / ✏️ Lägg till eller redigera ingredienser"):
         edited_ing_df = st.data_editor(
-            pd.DataFrame(st.session_state.ingredienser)[GILTIGA_KOLUMNER],
+            df_ing,
             num_rows="dynamic",
             hide_index=True,
             column_config={
