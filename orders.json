@@ -1,0 +1,70 @@
+[
+    {
+        "order_id": "Order 11-morfar",
+        "datum": "2026-06-13",
+        "rader": [
+            {
+                "Recept": "Muffins",
+                "Satser": 1.0,
+                "Bakade": 21,
+                "Sålda": 18,
+                "Pris_st": 15.0,
+                "Toppings_dict": {
+                    "Blåbär (kg)": 175.0
+                }
+            },
+            {
+                "Recept": "Biskvier",
+                "Satser": 1.0,
+                "Bakade": 17,
+                "Sålda": 17,
+                "Pris_st": 20.0,
+                "Toppings_dict": {}
+            },
+            {
+                "Recept": "Oat cookie",
+                "Satser": 1.0,
+                "Bakade": 24,
+                "Sålda": 24,
+                "Pris_st": 15.0,
+                "Toppings_dict": {
+                    "Chokladknappar (kg)": 150.0
+                }
+            }
+        ]
+    },
+    {
+        "order_id": "Order 7-Eivor",
+        "datum": "2026-04-29/2026-05-15",
+        "rader": [
+            {
+                "Recept": "Muffins",
+                "Satser": 1.0,
+                "Bakade": 19,
+                "Sålda": 17,
+                "Pris_st": 15.0,
+                "Toppings_dict": {
+                    "Blåbär (kg)": 175.0
+                }
+            },
+            {
+                "Recept": "Cookie",
+                "Satser": 1.0,
+                "Bakade": 27,
+                "Sålda": 25,
+                "Pris_st": 10.0,
+                "Toppings_dict": {
+                    "Chokladknappar (kg)": 100.0
+                }
+            },
+            {
+                "Recept": "Kanelbullar",
+                "Satser": 1.0,
+                "Bakade": 38,
+                "Sålda": 36,
+                "Pris_st": 10.0,
+                "Toppings_dict": {}
+            }
+        ]
+    }
+]
