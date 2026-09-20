@@ -1,0 +1,72 @@
+[
+    {
+        "namn": "Muffins",
+        "override_kostnad": 51.05,
+        "override_kcal": 4650,
+        "ingredienser": [
+            {"Ingrediens": "Mjöl (kg)", "Mängd": 300.0},
+            {"Ingrediens": "Socker (kg)", "Mängd": 200.0},
+            {"Ingrediens": "Egg (st)", "Mängd": 2.0}
+        ]
+    },
+    {
+        "namn": "Biskvier",
+        "override_kostnad": 96.19,
+        "override_kcal": 3350,
+        "ingredienser": []
+    },
+    {
+        "namn": "Oat cookie",
+        "override_kostnad": 65.87,
+        "override_kcal": 4100,
+        "ingredienser": []
+    },
+    {
+        "namn": "Brownie",
+        "override_kostnad": 78.32,
+        "override_kcal": 3850,
+        "ingredienser": []
+    },
+    {
+        "namn": "Cookie",
+        "override_kostnad": 40.22,
+        "override_kcal": 3200,
+        "ingredienser": []
+    },
+    {
+        "namn": "Bagels",
+        "override_kostnad": 21.06,
+        "override_kcal": 2850,
+        "ingredienser": []
+    },
+    {
+        "namn": "Morotskaka",
+        "override_kostnad": 69.86,
+        "override_kcal": 4400,
+        "ingredienser": []
+    },
+    {
+        "namn": "Chokladkaka",
+        "override_kostnad": 143.69,
+        "override_kcal": 9800,
+        "ingredienser": []
+    },
+    {
+        "namn": "Kanelbullar",
+        "override_kostnad": 69.26,
+        "override_kcal": 5450,
+        "ingredienser": []
+    },
+    {
+        "namn": "Orange cake",
+        "override_kostnad": 48.23,
+        "override_kcal": 820,
+        "ingredienser": []
+    },
+    {
+        "namn": "Cinnamon loaf",
+        "override_kostnad": 45.27,
+        "override_kcal": 820,
+        "ingredienser": []
+    }
+]
