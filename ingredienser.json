@@ -72,6 +72,12 @@
         "Kalorier": 2500
     },
     {
+        "Ingrediens": "Mjöl Graham",
+        "Pris": 13.17,
+        "Enhet": "kg",
+        "Kalorier": 3500
+    },
+    {
         "Ingrediens": "Gräddfil (kg)",
         "Pris": 39.0,
         "Enhet": "kg",
@@ -234,19 +240,19 @@
         "Kalorier": 4000
     },
     {
-        "Ingrediens": "Vetemjöl (kg)",
+        "Ingrediens": "Mjöl Vete (kg)",
         "Pris": 7.2,
         "Enhet": "kg",
         "Kalorier": 3500
     },
     {
-        "Ingrediens": "Vetemjöl Special (kg)",
+        "Ingrediens": "Mjöl Vete Special (kg)",
         "Pris": 11.33,
         "Enhet": "kg",
         "Kalorier": 3500
     },
     {
-        "Ingrediens": "Vetemjöl Special Fullkorn (kg)",
+        "Ingrediens": "Mjöl Vete Special Fullkorn (kg)",
         "Pris": 14.91,
         "Enhet": "kg",
         "Kalorier": 3500
@@ -262,11 +268,5 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
-    },
-    {
-        "Ingrediens": "Grahamsmjöl",
-        "Pris": 13.17,
-        "Enhet": "kg",
-        "Kalorier": 3500
     }
 ]
