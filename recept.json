@@ -139,9 +139,21 @@
             {
                 "Ingrediens": "Jäst (kg)",
                 "Mängd": 10.0
+            },
+            {
+                "Ingrediens": "Pumpakärnor (kg)",
+                "Mängd": 75.0
+            },
+            {
+                "Ingrediens": "Linfrön (kg)",
+                "Mängd": 30.0
+            },
+            {
+                "Ingrediens": "Solroskärnor (kg)",
+                "Mängd": 75.0
             }
         ],
-        "override_kostnad": 23.303,
-        "override_kcal": 2736
+        "override_kostnad": 36.09440000000001,
+        "override_kcal": 3757
     }
 ]
