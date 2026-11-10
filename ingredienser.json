@@ -192,6 +192,12 @@
         "Kalorier": 8800
     },
     {
+        "Ingrediens": "Pumpakärnor (kg)",
+        "Pris": 105.67,
+        "Enhet": "kg",
+        "Kalorier": 5600
+    },
+    {
         "Ingrediens": "Rågsikt (kg)",
         "Pris": 9.45,
         "Enhet": "kg",
@@ -268,11 +274,5 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
-    },
-    {
-        "Ingrediens": "Pumpakärnor (kg)",
-        "Pris": 105.67,
-        "Enhet": "kg",
-        "Kalorier": 5600
     }
 ]
