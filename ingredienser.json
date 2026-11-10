@@ -126,6 +126,12 @@
         "Kalorier": 5300
     },
     {
+        "Ingrediens": "Majsstärkelse (kg)",
+        "Pris": 42.35,
+        "Enhet": "kg",
+        "Kalorier": 3500
+    },
+    {
         "Ingrediens": "Mandel (kg)",
         "Pris": 330.0,
         "Enhet": "kg",
@@ -274,11 +280,5 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
-    },
-    {
-        "Ingrediens": "Majsstärkelse",
-        "Pris": 42.35,
-        "Enhet": "kg",
-        "Kalorier": 3500
     }
 ]
