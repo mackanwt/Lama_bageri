@@ -133,8 +133,8 @@
                     "Bakchoklad mörk (kg)": 150.0
                 },
                 "Satser": 1.0,
-                "Bakade": 23,
-                "Sålda": 21,
+                "Bakade": 24,
+                "Sålda": 23,
                 "Pris_st": 10.0
             },
             {
@@ -146,6 +146,14 @@
                 "Bakade": 23,
                 "Sålda": 21,
                 "Pris_st": 10.0
+            },
+            {
+                "Recept": "Bagels",
+                "Toppings_dict": {},
+                "Satser": 1.0,
+                "Bakade": 10,
+                "Sålda": 10,
+                "Pris_st": 15.0
             }
         ]
     }
