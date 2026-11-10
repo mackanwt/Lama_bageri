@@ -128,11 +128,11 @@
         "datum": "2026-11-10",
         "rader": [
             {
-                "Recept": "Bagels",
+                "Recept": "Cookies - new",
                 "Toppings_dict": {},
                 "Satser": 1.0,
-                "Bakade": 10,
-                "Sålda": 10,
+                "Bakade": 23,
+                "Sålda": 21,
                 "Pris_st": 15.0
             }
         ]
