@@ -155,5 +155,40 @@
         ],
         "override_kostnad": 36.09440000000001,
         "override_kcal": 3757
+    },
+    {
+        "namn": "Cookies - new",
+        "ingredienser": [
+            {
+                "Ingrediens": "Mjöl Vete (kg)",
+                "Mängd": 210.0
+            },
+            {
+                "Ingrediens": "Bikarbonat (kg)",
+                "Mängd": 5.0
+            },
+            {
+                "Ingrediens": "Vaniljsocker (kg)",
+                "Mängd": 10.0
+            },
+            {
+                "Ingrediens": "Smör (kg)",
+                "Mängd": 200.0
+            },
+            {
+                "Ingrediens": "Socker (kg)",
+                "Mängd": 50.0
+            },
+            {
+                "Ingrediens": "Brunsocker (kg)",
+                "Mängd": 140.0
+            },
+            {
+                "Ingrediens": "Egg (st)",
+                "Mängd": 1.0
+            }
+        ],
+        "override_kostnad": 36.895500000000006,
+        "override_kcal": 3017
     }
 ]
