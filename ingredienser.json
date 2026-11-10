@@ -274,5 +274,11 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
+    },
+    {
+        "Ingrediens": "Majsstärkelse",
+        "Pris": 42.35,
+        "Enhet": "kg",
+        "Kalorier": 3500
     }
 ]
