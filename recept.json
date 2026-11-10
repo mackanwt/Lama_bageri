@@ -186,9 +186,13 @@
             {
                 "Ingrediens": "Egg (st)",
                 "Mängd": 1.0
+            },
+            {
+                "Ingrediens": "Majsstärkelse (kg)",
+                "Mängd": 6.0
             }
         ],
-        "override_kostnad": 36.895500000000006,
-        "override_kcal": 3017
+        "override_kostnad": 37.14960000000001,
+        "override_kcal": 3038
     }
 ]
