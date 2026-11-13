@@ -280,5 +280,11 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
+    },
+    {
+        "Ingrediens": "Potatismjöl (kg)",
+        "Pris": 27.8,
+        "Enhet": "kg",
+        "Kalorier": 3200
     }
 ]
