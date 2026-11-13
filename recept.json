@@ -194,5 +194,32 @@
         ],
         "override_kostnad": 37.14960000000001,
         "override_kcal": 3038
+    },
+    {
+        "namn": "Tårtbotten",
+        "ingredienser": [
+            {
+                "Ingrediens": "Bakpulver (kg)",
+                "Mängd": 10.0
+            },
+            {
+                "Ingrediens": "Egg (st)",
+                "Mängd": 5.0
+            },
+            {
+                "Ingrediens": "Socker (kg)",
+                "Mängd": 250.0
+            },
+            {
+                "Ingrediens": "Mjöl Vete (kg)",
+                "Mängd": 75.0
+            },
+            {
+                "Ingrediens": "Potatismjöl (kg)",
+                "Mängd": 100.0
+            }
+        ],
+        "override_kostnad": 19.4575,
+        "override_kcal": 1932
     }
 ]
