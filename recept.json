@@ -221,5 +221,28 @@
         ],
         "override_kostnad": 19.4575,
         "override_kcal": 1932
+    },
+    {
+        "namn": "Tårtbotten Schwarzwald",
+        "ingredienser": [
+            {
+                "Ingrediens": "Hasselnötter",
+                "Mängd": 200.0
+            },
+            {
+                "Ingrediens": "Egg (st)",
+                "Mängd": 5.0
+            },
+            {
+                "Ingrediens": "Florsocker (kg)",
+                "Mängd": 175.0
+            },
+            {
+                "Ingrediens": "Bakchoklad mörk (kg)",
+                "Mängd": 100.0
+            }
+        ],
+        "override_kostnad": 64.2575,
+        "override_kcal": 2846
     }
 ]
