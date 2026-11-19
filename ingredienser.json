@@ -198,6 +198,12 @@
         "Kalorier": 8800
     },
     {
+        "Ingrediens": "Potatismjöl (kg)",
+        "Pris": 27.8,
+        "Enhet": "kg",
+        "Kalorier": 3200
+    },
+    {
         "Ingrediens": "Pumpakärnor (kg)",
         "Pris": 105.67,
         "Enhet": "kg",
@@ -280,11 +286,5 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
-    },
-    {
-        "Ingrediens": "Potatismjöl (kg)",
-        "Pris": 27.8,
-        "Enhet": "kg",
-        "Kalorier": 3200
     }
 ]
