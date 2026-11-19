@@ -64,6 +64,7 @@ GITHUB_REPO = st.secrets.get("GITHUB_REPO", "")
 FILE_INGREDIENSER = "ingredienser.json"
 FILE_RECEPT = "recept.json"
 FILE_ORDERS = "orders.json"
+FILE_TOPPINGS = "toppings.json"
 
 # ==========================================
 # DEFAULT DATA (OM GITHUB MISSLYCKAS)
@@ -205,7 +206,7 @@ if "orders_db" not in st.session_state:
     st.session_state.orders_db = load_file_from_github(FILE_ORDERS, DEFAULT_ORDERS)
 
 if "toppings_lista" not in st.session_state:
-    st.session_state.toppings_lista = DEFAULT_TOPPINGS
+    st.session_state.toppings_lista = load_file_from_github(FILE_TOPPINGS, DEFAULT_TOPPINGS)
 
 if "aktiv_recept_vy" not in st.session_state:
     st.session_state.aktiv_recept_vy = None
@@ -308,6 +309,7 @@ with tab2:
             if st.button("➕ Lägg till"):
                 if ny_topping and ny_topping not in st.session_state.toppings_lista:
                     st.session_state.toppings_lista.append(ny_topping)
+                    save_file_to_github(FILE_TOPPINGS, st.session_state.toppings_lista)
                     st.success("Topping tillagd!")
                     st.rerun()
 
@@ -324,6 +326,7 @@ with tab2:
 
         if top_to_remove:
             st.session_state.toppings_lista.remove(top_to_remove)
+            save_file_to_github(FILE_TOPPINGS, st.session_state.toppings_lista)
             st.success("Topping raderad!")
             st.rerun()
 
@@ -521,10 +524,12 @@ with tab4:
                     r["Pris_st"] = st.number_input("Pris/st (kr)", min_value=0.0, value=float(r.get("Pris_st", 0.0)), step=0.5, key=f"prs_{valj_order_id}_{idx}")
 
                 existerande_toppings = r.get("Toppings_dict", {})
+                mojliga_toppings = sorted(list(set(st.session_state.toppings_lista) | set(existerande_toppings.keys())))
+                sakra_default_toppings = [t for t in existerande_toppings.keys() if t in mojliga_toppings]
                 valda_toppings = st.multiselect(
                     "Välj Toppings:",
-                    options=sorted(st.session_state.toppings_lista),
-                    default=list(existerande_toppings.keys()),
+                    options=mojliga_toppings,
+                    default=sakra_default_toppings,
                     key=f"top_multi_{valj_order_id}_{idx}"
                 )
 
