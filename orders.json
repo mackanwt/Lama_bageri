@@ -162,12 +162,18 @@
         "datum": "2026-11-23",
         "rader": [
             {
-                "Recept": "Bagels",
-                "Toppings_dict": {},
+                "Recept": "Tårtbotten Schwarzwald",
+                "Toppings_dict": {
+                    "Hasselnötter": 30.0,
+                    "Kakao (kg)": 10.0,
+                    "Vispgrädde (kg)": 750.0,
+                    "Vaniljsocker (kg)": 10.0,
+                    "Bakchoklad mörk (kg)": 100.0
+                },
                 "Satser": 1.0,
-                "Bakade": 10,
-                "Sålda": 10,
-                "Pris_st": 15.0
+                "Bakade": 1,
+                "Sålda": 1,
+                "Pris_st": 350.0
             }
         ]
     }
