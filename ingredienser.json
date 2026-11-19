@@ -286,5 +286,11 @@
         "Pris": 28.5,
         "Enhet": "kg",
         "Kalorier": 600
+    },
+    {
+        "Ingrediens": "Hasselnötter",
+        "Pris": 146.0,
+        "Enhet": "kg",
+        "Kalorier": 6280
     }
 ]
